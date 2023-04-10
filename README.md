@@ -71,3 +71,50 @@ ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 python src/workflow.py assets_eckert.gpkg out.csv
 ```
 
+## Modes of operation
+
+### mode 1
+In mode 1, structures are modeled as coordinate points. The actual footprint area is not known or assumed.
+
+### mode 2
+In mode 2, structures are modeled as coordinate points. The actual footprint area is not known, but is approximated by drawing a circle around each point.
+
+### mode 3
+In mode 3, the actual footprints are known. Structures are modeled as polygons outlining their footprint on the landscape.
+
+## Summary of modes
+
+| mode | command                                             | input format   | output format                 |
+|------|-----------------------------------------------------|----------------|-------------------------------|
+| 1    | `python footprint_impact.py points <path>`          | point vector   | CSV and point vector (GPKG)   |
+| 2    | `python footprint_impact.py points --buffer <path>` | point vector   | CSV and polygon vector (GPKG) |
+| 3    | `python footprint_impact.py polygons <path>`        | polygon vector | CSV and polygon vector (GPKG) |
+
+## Input formats
+
+### point vector
+Point data may be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. No attributes are required. Any attributes that there are will be preserved in the output.
+
+### polygon vector
+Polygon data may be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that there are will be preserved in the output.
+
+## Output formats
+
+The ecosystem services are:
+- `sediment`
+
+### CSV and point vector
+Mode 1 produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
+
+### polygon vector
+Modes 2 and 3 produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
+
+The statistics are:
+- `min`: minimum ecosystem service value found in pixels underneath the footprint polygon
+- `max`: maximum ecosystem service value found in pixels underneath the footprint polygon
+- `sum`: sum of ecosystem service pixel values underneath the footprint polygon
+- `count`: number of pixels with data underneath the footprint polygon
+- `nodata_count`: number of pixels without data underneath the footprint polygon
+
+
+
