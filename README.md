@@ -44,51 +44,59 @@ This data was derived by manually estimating the footprint area of real assets o
 Each row represents an ecosystem service.
 Columns are:
 - `es_id`: An identifier for the ecosystem service
-- `path`: Path to a global raster map of the ecosystem service
-- 0 - 100: Percentile values of the ecosystem service globally
+- `es_value_path`: Path to a global raster map of the ecosystem service
+- `es_flag_path`: Path to a global raster map of where to flag the ecosystem service. Values are binary (1 = flagged, 0 = not flagged)
 
-| es_id    | path                  | 0   | 1     | 2    | ... | 100    |
-|----------|-----------------------|-----|-------|------|-----|--------|
-| sediment | gs://foo-sediment.tif | 0   | 0.003 | 1.45 | ... | 2089.9 |
-| ...      | ...                   | ... | ...   | ...  | ... | ...    |
+| es_id    | es_value_path         | es_flag_path           |
+|----------|-----------------------|------------------------|
+| sediment | gs://foo-sediment.tif | gs://sediment-flag.tif |
+| ...      | ...                   | ...                    |
 
-The percentiles are pre-calculated and stored in this table because they are time-consuming to calculate.
 You may modify or replace this table if you wish to use different data.
 
+## Installation
+
+```
+git clone https://github.com/natcap/natural-capital-footprint-impact.git
+conda create -n footprint python gdal
+conda activate footprint
+pip install .
+```
+The command `natural-capital-footprint-impact` should now be available.
+
 ## Workflow
-1. If your point data is in CSV format, convert it to a GDAL-supported vector format such as GPKG:
+1. If your asset point data is in CSV format, convert it to a GDAL-supported vector format such as GPKG:
 ```
 ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:4326 -oo X_POSSIBLE_NAMES=longitude -oo Y_POSSIBLE_NAMES=latitude assets.gpkg assets.csv
 ```
 
-2. If your point data is in a geographic (non-projected) coordinate system, such as latitude/longitude, reproject it to a projected coordinate system, such as Eckert IV:
+2. If your asset data is in a geographic (non-projected) coordinate system, such as latitude/longitude, reproject it to a projected coordinate system, such as Eckert IV:
 ```
 ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 ```
 
 3. Run the workflow:
 ```
-python src/workflow.py assets_eckert.gpkg out.csv
+natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [--buffer-table BUFFER_TABLE] asset_vector
 ```
 
 ## Modes of operation
 
 ### mode 1
-In mode 1, structures are modeled as coordinate points. The actual footprint area is not known or assumed.
+`natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path>`
+
+In mode 1, assets are modeled as coordinate points. The actual footprint area is not known or assumed.
 
 ### mode 2
-In mode 2, structures are modeled as coordinate points. The actual footprint area is not known, but is approximated by drawing a circle around each point.
+`natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path>`
+
+In mode 2, asseets are modeled as coordinate points. The actual footprint area is not known, but is approximated by drawing a circle around each point.
 
 ### mode 3
-In mode 3, the actual footprints are known. Structures are modeled as polygons outlining their footprint on the landscape.
+`natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path>`
 
-## Summary of modes
+In mode 3, the actual footprints are known. Assets are modeled as polygons outlining their footprint on the landscape.
 
-| mode | command                                             | input format   | output format                 |
-|------|-----------------------------------------------------|----------------|-------------------------------|
-| 1    | `python footprint_impact.py points <path>`          | point vector   | CSV and point vector (GPKG)   |
-| 2    | `python footprint_impact.py points --buffer <path>` | point vector   | CSV and polygon vector (GPKG) |
-| 3    | `python footprint_impact.py polygons <path>`        | polygon vector | CSV and polygon vector (GPKG) |
 
 ## Input formats
 
@@ -101,20 +109,18 @@ Polygon data may be provided in a [GDAL-supported vector format](https://gdal.or
 ## Output formats
 
 The ecosystem services are:
-- `sediment`
+- `coastal_risk_reduction_service`
+- `nitrogen_retention_service`
+- `sediment_retention_service`
+- `nature_access`
+- `endemic_biodiversity`
+- `redlist_species`
+- `species_richness`
+- `kba`
 
 ### CSV and point vector
 Mode 1 produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
 ### polygon vector
 Modes 2 and 3 produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
-
-The statistics are:
-- `min`: minimum ecosystem service value found in pixels underneath the footprint polygon
-- `max`: maximum ecosystem service value found in pixels underneath the footprint polygon
-- `sum`: sum of ecosystem service pixel values underneath the footprint polygon
-- `count`: number of pixels with data underneath the footprint polygon
-- `nodata_count`: number of pixels without data underneath the footprint polygon
-
-
 
