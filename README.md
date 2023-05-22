@@ -38,7 +38,7 @@ The second column is named `area`. This is the size (in square meters) of footpr
 | Bank Branch       | 549.7          |
 | ...               | ...            |
 
-This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the average of a small sample from each category. You may modify or replace this table if you wish to use different data.
+This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
 
 ### ecosystem service data
 Each row represents an ecosystem service.
