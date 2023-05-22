@@ -1,5 +1,0 @@
-gdal
-geopandas
-numpy
-pandas
-pygeoprocessing

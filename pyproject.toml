@@ -1,0 +1,26 @@
+[project]
+name = "natural-capital-footprint-impact"
+description = ""
+readme = ""
+requires-python = ">=3.8,<3.11"
+license = {file = "LICENSE.md"}
+dependencies = [
+    "gdal",
+    "geopandas",
+    "numpy",
+    "pandas",
+    "pygeoprocessing",
+    "pyogrio",
+    "rasterio"
+]
+version = "0.1.0"
+
+[project.scripts]
+natural-capital-footprint-impact = "impact.cli:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
