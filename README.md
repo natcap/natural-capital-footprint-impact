@@ -33,7 +33,7 @@ A table where each row represents an asset category.
 The first column is named after the asset category attribute. In this example, `facility_category` is used consistent with the S&P asset data.
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category.
 
-| facility_category | footprint_area |
+| facility_category | area |
 |-------------------|----------------|
 | Bank Branch       | 549.7          |
 | ...               | ...            |
