@@ -39,6 +39,10 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
 
     logger.info('retrieving values under points...')
     point_gdf = geopandas.read_file(point_path)
+
+    if not (point_gdf.geom_type == 'Point').all():
+        raise ValueError('All geometries in the asset vector must be points')
+
     # get list of (x, y) points
     coord_list = [
         (x,y) for x,y in zip(
@@ -119,6 +123,9 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
     logger.info('calculating statistics under footprints...')
     footprint_gdf = geopandas.read_file(
         footprint_path, engine='pyogrio', fid_as_index=True)
+
+    if not (footprint_gdf.geom_type == 'Polygon').all():
+        raise ValueError('All geometries in the asset vector must be polygons')
     
     es_df = pandas.read_csv(es_table_path)
     value_raster_dict = {row[id_col]: row['es_value_path'] for _, row in es_df.iterrows()}
@@ -132,9 +139,6 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
         zonal_stats = pygeoprocessing.zonal_statistics(
             (value_raster_path, 1), footprint_path)
 
-        print(zonal_stats)
-        print(footprint_gdf)
-
         for stat in stats:
             stat_series = pandas.Series(
                 fid_series.map(lambda fid: zonal_stats[fid][stat]))
@@ -146,9 +150,6 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
         zonal_stats = pygeoprocessing.zonal_statistics(
             (flag_raster_path, 1), footprint_path)
 
-        print(zonal_stats)
-        print(footprint_gdf)
-
         flag_series = pandas.Series(
             fid_series.map(lambda fid: zonal_stats[fid]['sum'] > 0))
         footprint_gdf[f'{es_id}_flag'] = flag_series
@@ -156,7 +157,7 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
     return footprint_gdf
 
 
-def buffer_points(point_vector_path: str, buffer_csv_path: str, attr: str, area_col='footprint_area'):
+def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_area'):
     """Buffer points according to a given attribute.
     
     For a given row in `gdf`, `row['geometry']` will be buffered to form a
@@ -179,14 +180,25 @@ def buffer_points(point_vector_path: str, buffer_csv_path: str, attr: str, area_
         replaced with a circular footprint
         
     Raises:
-        Error if there are `facility_category` values in `gdf` that are not 
-            found in `buffer_df`
-        Warning if there are `facility_category` values in `buffer_df` that 
-            are not found in `gdf`
+        ValueError if any geometry in the vector is not a point
+
+        ValueError if there are `facility_category` values in the point vector
+            that are not found in the buffer table
     """
     logger.info('buffering points to create footprints...')
     gdf = geopandas.read_file(point_vector_path)
+    if not (gdf.geom_type == 'Point').all():
+        raise ValueError('All geometries in the asset vector must be points')
+
     buffer_df = pandas.read_csv(buffer_csv_path)
+
+    point_categories = set(gdf[attr].unique())
+    buffer_categories = set(buffer_df[attr].unique())
+    if point_categories - buffer_categories:
+        raise ValueError(
+            f'The following values of "{attr}" were found in the asset vector '
+            f'but not the buffer table: {point_categories - buffer_categories}')
+
     for _, row in buffer_df.iterrows():
         # calculate the radius needed to draw a circle that has the given area
         buffer_radius = math.sqrt(row[area_col] / math.pi)
@@ -194,6 +206,7 @@ def buffer_points(point_vector_path: str, buffer_csv_path: str, attr: str, area_
         # draw a polygon that approximates a circle
         matches = gdf[mask]
         gdf.loc[mask, 'geometry'] = gdf.loc[mask, 'geometry'].buffer(buffer_radius)
+
     return gdf
 
 
@@ -214,7 +227,6 @@ def aggregate_footprints(gdf, out_path, aggregate_by):
     vals = gdf[aggregate_by].unique()
 
     for company in vals:
-        print(company)
         company_rows = gdf[gdf[aggregate_by] == company]
         results[company] = {}
         total_flags = pandas.Series([False for _ in range(company_rows.shape[0])])
