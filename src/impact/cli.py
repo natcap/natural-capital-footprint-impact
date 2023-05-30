@@ -20,16 +20,25 @@ attr = 'facility_category'
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--ecosystem-service-table', required=True)
-    parser.add_argument('--footprint-results-path', default='footprint_stats.gpkg')
-    parser.add_argument('--company-results-path', default='company_stats.csv')
-    subparsers = parser.add_subparsers(help='execution mode', dest='mode', required=True)
-    points_parser = subparsers.add_parser('points', help='provide asset coordinates')
-    points_parser.add_argument('--buffer-table', help='buffer points according to values in table')
-    points_parser.add_argument('asset_vector', help='path to asset point vector')
-    polygons_parser = subparsers.add_parser('polygons', help='provide asset footprint polygons')
-    polygons_parser.add_argument('asset_vector', help='path to asset polygon vector')
+    parser.add_argument('-e', '--ecosystem-service-table', required=True,
+                        help='path to the ecosystem service table')
+    parser.add_argument('mode', choices=['points', 'polygons'],
+                        help=(
+                            'mode of operation. in points mode, the asset vector '
+                            'contains point geometries. in polygons mode, it contains '
+                            'polygon geometries.'))
+    parser.add_argument('-b', '--buffer-table',
+                        help='buffer points according to values in this table')
+    parser.add_argument('asset_vector',
+                        help='path to the asset vector')
+    parser.add_argument('footprint_results_path',
+                        help='path to write out the asset results vector')
+    parser.add_argument('company_results_path',
+                        help='path to write out the aggregated results table')
     args = parser.parse_args()
+
+    if args.buffer_table and args.mode == 'polygons':
+        raise ValueError('Cannot use a buffer table in polygon mode')
 
     if args.mode == 'points':
         if args.buffer_table:
@@ -37,6 +46,7 @@ def main():
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmp_footprint_path = os.path.join(tmpdir, 'footprints.gpkg')
                 footprint_gdf.to_file(tmp_footprint_path, driver='GPKG', layer='footprints')
+
                 footprint_gdf = footprint_stats(tmp_footprint_path, args.ecosystem_service_table)
         else:
             point_gdf = point_stats(args.asset_vector, args.ecosystem_service_table)

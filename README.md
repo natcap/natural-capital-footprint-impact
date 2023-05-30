@@ -82,20 +82,40 @@ natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [-
 
 ## Modes of operation
 
-### mode 1
-`natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path>`
+```
+usage: natural-capital-footprint-impact [-h] -e ECOSYSTEM_SERVICE_TABLE [-b BUFFER_TABLE]
+                                        {points,polygons} asset_vector footprint_results_path company_results_path
 
-In mode 1, assets are modeled as coordinate points. The actual footprint area is not known or assumed.
+positional arguments:
+  {points,polygons}     mode of operation. in points mode, the asset vector contains point geometries. in polygons mode, it contains polygon geometries.
+  asset_vector          path to the asset vector
+  footprint_results_path
+                        path to write out the asset results vector
+  company_results_path  path to write out the aggregated results table
+
+options:
+  -h, --help            show this help message and exit
+  -e ECOSYSTEM_SERVICE_TABLE, --ecosystem-service-table ECOSYSTEM_SERVICE_TABLE
+                        path to the ecosystem service table
+  -b BUFFER_TABLE, --buffer-table BUFFER_TABLE
+                        buffer points according to values in this table
+```
+
+
+### mode 1
+`natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path> <output vector path> <output table path>`
+
+In mode 1, you provide the assets as coordinate points. The asset footprint is not known or modeled. Statistics are calculated under each point only.
 
 ### mode 2
-`natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path>`
+`natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
 
-In mode 2, asseets are modeled as coordinate points. The actual footprint area is not known, but is approximated by drawing a circle around each point.
+In mode 2, you provide the assets as coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category. Statistics are calculated under each footprint.
 
 ### mode 3
-`natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path>`
+`natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
 
-In mode 3, the actual footprints are known. Assets are modeled as polygons outlining their footprint on the landscape.
+In mode 3, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Statistics are calculated under each footprint.
 
 
 ## Input formats
