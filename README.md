@@ -33,12 +33,12 @@ A table where each row represents an asset category.
 The first column is named after the asset category attribute. In this example, `facility_category` is used consistent with the S&P asset data.
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category.
 
-| facility_category | footprint_area |
+| facility_category | area |
 |-------------------|----------------|
 | Bank Branch       | 549.7          |
 | ...               | ...            |
 
-This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the average of a small sample from each category. You may modify or replace this table if you wish to use different data.
+This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
 
 ### ecosystem service data
 Each row represents an ecosystem service.
