@@ -10,9 +10,9 @@ Some useful definitions:
 - Footprint: The area on the earth surface taken up by an asset.
 
 Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset is usually not available. To account for these, this tool can be used in three different ways:
-1/ The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
-2/ Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
-3/ Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data is available. Statistics are calculated under each footprint.
+1. The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
+2. Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
+3. Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data is available. Statistics are calculated under each footprint.
 
 ## Data you must provide
 The instructions below assume that you begin with the following information about the assets of interest:
