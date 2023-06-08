@@ -3,7 +3,7 @@
 
 Company footprint impact workflow (eventually to be made public)
 
-This script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
+This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -51,7 +51,7 @@ The second column is named `area`. This is the size (in square meters) of footpr
 | Bank Branch       | 549.7          |
 | ...               | ...            |
 
-*Table 2. Buffer table: footprint area modeled for each facility category, used in Buffer mode.*
+*Table 2. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
 
 This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
 
@@ -73,7 +73,7 @@ You may modify or replace this table if you wish to use different ecosystem serv
 
 ## Installation
 
-{SW: Provide more information on needing to have git, conda etc installed, and doing this on the command line.}
+{SW: Provide more information on needing to have git, conda etc installed.}
 
 ```
 git clone https://github.com/natcap/natural-capital-footprint-impact.git
@@ -92,7 +92,7 @@ To do this in QGIS, use the *Add Delimited Text Layer* tool to add the CSV data 
 
 In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point* tool. This will create a point shapefile that you can use instead of a GeoPackage. 
 
-2. If your asset data is in a geographic (non-projected) coordinate system, such as latitude/longitude, reproject it to a projected coordinate system, such as Eckert IV:
+2. If your asset data is in a geographic (non-projected) coordinate system (where distances are given in degrees), reproject it to a projected coordinate system (where distances are in meters), such as Eckert IV:
 ```
 ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 ```
@@ -135,7 +135,7 @@ In **Point mode**, you provide the assets as latitude/longitude coordinate point
 ### Buffer mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
 
-In **Buffer mode**, you provide the assets as coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category. Statistics are calculated under each footprint.
+In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category in the Buffer table. Statistics are calculated under each footprint.
 
 ### Polygon mode
 `natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
@@ -153,6 +153,8 @@ Polygon data may be provided in a [GDAL-supported vector format](https://gdal.or
 
 ## Output formats
 
+{SW: Add details about the added fields - names, units, description, etc. An example for each would be good too.}
+
 The ecosystem services provided are:
 - `coastal_risk_reduction_service`
 - `nitrogen_retention_service`
@@ -162,8 +164,6 @@ The ecosystem services provided are:
 - `redlist_species`
 - `species_richness`
 - `kba`
-
-{SW: Both of these need details about the added fields and what they mean. An example would be good too.}
 
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
