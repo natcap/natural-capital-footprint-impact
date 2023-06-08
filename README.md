@@ -10,9 +10,9 @@ Some useful definitions:
 - **Footprint**: The area on the earth surface taken up by an asset.
 
 Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this tool can be used in three different ways:
-1. **Point mode**: Assets are provided as latitude/longitude points. The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
-2. **Buffer mode**: Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
-3. **Polygon mode**: Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data are available. Statistics are calculated under each footprint.
+1. **Point mode**: Assets are provided by the user as latitude/longitude points. The actual asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
+2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Ecosystem service statistics are calculated under each buffer/footprint.
+3. **Polygon mode**: Assets are provided by the user as footprint polygons. This mode is preferred if actual asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
 
 ## Data you must provide
 
