@@ -9,7 +9,7 @@ Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, a restaurant, a cell tower, a hospital, a pipeline, or a billboard.
 - **Footprint**: The area on the earth surface taken up by an asset.
 
-Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset is usually not available. To account for differences in data availability, this tool can be used in three different ways:
+Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this tool can be used in three different ways:
 1. **Point mode**: Assets are provided as latitude/longitude points. The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
 2. **Buffer mode**: Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
 3. **Polygon mode**: Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data are available. Statistics are calculated under each footprint.
