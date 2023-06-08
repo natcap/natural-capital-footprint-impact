@@ -6,10 +6,10 @@ Company footprint impact workflow (eventually to be made public)
 This script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
 Some useful definitions:
-- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, a restaurant, a cell tower, a hospital, a pipeline, or a billboard.
+- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, restaurant, cell tower, hospital, pipeline, or billboard.
 - **Footprint**: The area on the earth surface taken up by an asset.
 
-Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this tool can be used in three different ways:
+Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this script can be used in three different ways:
 1. **Point mode**: Assets are provided by the user as latitude/longitude points. The actual asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Ecosystem service statistics are calculated under each buffer/footprint.
 3. **Polygon mode**: Assets are provided by the user as footprint polygons. This mode is preferred if actual asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
@@ -35,7 +35,9 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
 
-*Table 1. Asset vector attribute table field requirements.*
+*Table 1. Asset vector attribute table field requirements for Point mode and Buffer mode.*
+
+If you are running the script in **Polygon mode**, no specific fields are required by the script. {?? Is this true ??}
 
 ## Data provided for you
 
