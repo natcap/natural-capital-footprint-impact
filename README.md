@@ -53,14 +53,14 @@ The second column is named `area`. This is the size (in square meters) of footpr
 
 *Table 2. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
 
-This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
+The provided footprint areas were derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
 
 ### ecosystem service data
 CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
 - `es_id`: A text (string) identifier for the ecosystem service
-- `es_value_path`: File path to a geospatial raster map of the ecosystem service
-- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged.
+- `es_value_path`: File path to a geospatial raster map of the ecosystem service {??? File type requirements ???}
+- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. {??? is this a number? how is it determined? Need to explain flags in more detail. ???}
 
 | es_id    | es_value_path         | flag_threshold         |
 |----------|-----------------------|------------------------|
