@@ -3,13 +3,16 @@
 
 Company footprint impact workflow (eventually to be made public)
 
-This script calculates metrics of the impact of man-made structures on certain ecosystem services, based on their physical footprint on the landscape.
+This script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
+Some useful definitions:
 - Asset: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, a restaurant, a cell tower, a hospital, a pipeline, or a billboard.
 - Footprint: The area on the earth surface taken up by an asset.
 
-Asset location data is usually available as point coordinates. The real footprint of an asset is usually not available. We approximate the footprint by drawing a circle around the point. If actual footprint data is available, you may substitute that in.
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations.
+Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset is usually not available. To account for these, this tool can be used in three different ways:
+1/ The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
+2/ Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
+3/ Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data is available. Statistics are calculated under each footprint.
 
 ## Data you must provide
 The instructions below assume that you begin with the following information about the assets of interest:
@@ -19,7 +22,7 @@ The instructions below assume that you begin with the following information abou
 
 This data should be formatted into a table where each row represents an asset.
 Coordinate locations of each asset are in the `latitude` and `longitude` columns.
-The `category` column determines footprint size. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
+The `category` column determines footprint size. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
 | latitude | longitude | facility_category | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
@@ -71,7 +74,7 @@ ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:4326 -oo X_POSSIBLE_NAMES=longitude -oo Y_P
 ```
 To do this in QGIS, use the *Add Delimited Text Layer* tool to add the CSV data as a point layer, then *Export > Save Features As* to save the layer to a GeoPackage.
 
-In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point* tool. This will create a point shapefile that you can use as input to this script. 
+In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point* tool. This will create a point shapefile that you can use instead of a GeoPackage. 
 
 2. If your asset data is in a geographic (non-projected) coordinate system, such as latitude/longitude, reproject it to a projected coordinate system, such as Eckert IV:
 ```
