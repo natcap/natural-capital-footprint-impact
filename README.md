@@ -168,6 +168,25 @@ For each service, the provided statistics are:
 - `nodata_count`: number of pixels within the asset_footprint that are missing for the service
 - `flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
 
+### Footprint statistics vector
+The output vector attribute table contains 30 columns named `<service>_<statistic>`, for each combination of the 5 ecosystem services and 6 statistics listed above.
+
+### Company statistics table
+The output company table contains 
+
+- `<service>_sum`: Sum of natural capital values under asset footprints for each service
+- `<service>_mean`: Mean of natural capital values under asset footprints
+- `<service>_assets`: For each service, the number of assets with data
+- `<service>_area`: total area of asset footprints per company that are overlapping data for each service
+- `<service>_flags`: For each service, the number of assets flagged
+- `percent_<service>_flagged`:  For each service, the percent of assets flagged
+- `total_assets`: Total number of assets belonging to each company
+- `total_area`: Total area of asset footprints belonging to each company
+- `total_flags`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
+- `percent_total_flagged`: Percent of assets flagged in any category With and without nature access
+
+
+
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
