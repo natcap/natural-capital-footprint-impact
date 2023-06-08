@@ -15,14 +15,20 @@ Asset location data is usually available as point coordinates (latitude/longitud
 3. **Polygon mode**: Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data are available. Statistics are calculated under each footprint.
 
 ## Data you must provide
+
+### asset location data
+
 The instructions below assume that you have the following information about each asset of interest:
 - its coordinate point location
 - its category
 - its owner
 
-This data should be formatted into a table where each row represents an asset.
-Coordinate locations of each asset are in the `latitude` and `longitude` columns.
-The `category` column determines footprint size. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
+The tool requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). The vector layer contains an attribute table, where each row represents an asset. The following fields are used by the tool:
+
+1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. This field is required when using both **Point mode** and **Buffer mode**.
+2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
+
+Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
 | latitude | longitude | facility_category | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
@@ -34,11 +40,11 @@ Table 1. User-provided asset data attibute table field requirements.
 ## Data provided for you
 
 ### footprint data by asset category
-A table where each row represents an asset category.
+CSV (comma-separated value) table, where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the categories in the asset table.
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
-| facility_category | area |
+| category          | area           |
 |-------------------|----------------|
 | Bank Branch       | 549.7          |
 | ...               | ...            |
@@ -48,11 +54,11 @@ Table 2. Script-provided facility category table, used for buffering point locat
 This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
 
 ### ecosystem service data
-Each row represents an ecosystem service.
+CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
-- `es_id`: An identifier for the ecosystem service
-- `es_value_path`: Path to a global raster map of the ecosystem service
-- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with a value greater than this threshold will be flagged.
+- `es_id`: A text (string) identifier for the ecosystem service
+- `es_value_path`: Path to a geospatial raster map of the ecosystem service
+- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged.
 
 | es_id    | es_value_path         | flag_threshold         |
 |----------|-----------------------|------------------------|
@@ -61,7 +67,7 @@ Columns are:
 
 Table 3. Table defining the ecosystem service layers that will be used by the script.
 
-You may modify or replace this table if you wish to use different ecosystem service data.
+You may modify or replace this table if you wish to use different ecosystem service data, but it must be in CSV format.
 
 ## Installation
 
