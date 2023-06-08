@@ -28,6 +28,7 @@ The `category` column determines footprint size. Footprint sizes vary widely, bu
 |----------|-----------|-------------------|-------------------------|
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
+
 Table 1. User-provided asset data attibute table field requirements.
 
 ## Data provided for you
@@ -41,6 +42,7 @@ The second column is named `area`. This is the size (in square meters) of footpr
 |-------------------|----------------|
 | Bank Branch       | 549.7          |
 | ...               | ...            |
+
 Table 2. Script-provided facility category table, used for buffering point locations for different category types.
 
 This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
@@ -56,6 +58,7 @@ Columns are:
 |----------|-----------------------|------------------------|
 | sediment | gs://foo-sediment.tif | 123                    |
 | ...      | ...                   | ...                    |
+
 Table 3. Table defining the ecosystem service layers that will be used by the script.
 
 You may modify or replace this table if you wish to use different ecosystem service data.
