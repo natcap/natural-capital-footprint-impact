@@ -11,7 +11,7 @@ Some useful definitions:
 
 Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this script can be used in three different ways:
 1. **Point mode**: Assets are provided by the user as latitude/longitude points. The actual asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
-2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Ecosystem service statistics are calculated under each buffer/footprint.
+2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is modeled by creating a circular buffer with defined area around each point. Ecosystem service statistics are calculated under each buffer/footprint.
 3. **Polygon mode**: Assets are provided by the user as footprint polygons. This mode is preferred if actual asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
 
 ## Data you must provide
@@ -25,10 +25,10 @@ The instructions below assume that you have the following information about each
 
 The script requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). The vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
-1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. This field is required when using both **Point mode** and **Buffer mode**.
+1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. These fields are required when using both **Point mode** and **Buffer mode**.
 2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
 
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
+Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {SW: Add more information about what aggregation means and how it works}
 
 | latitude | longitude | category          | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
