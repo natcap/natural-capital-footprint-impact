@@ -142,7 +142,7 @@ In **Point mode**, you provide the assets as latitude/longitude coordinate point
 ### Buffer mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
 
-In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category in the Buffer table. Statistics are calculated under each footprint.
+In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Statistics are calculated under each footprint.
 
 ### Polygon mode
 `natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
