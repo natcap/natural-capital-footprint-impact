@@ -18,13 +18,6 @@ Asset location data is usually available as point coordinates (latitude/longitud
 
 ### asset vector
 
-The instructions below assume that you have the following information about each asset of interest:
-- its coordinate (latitude/longitude) point location
-- its category
-- its owner
-
-The script requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). 
-
 #### Point asset vector
 
 Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that there in the original vector attribute table will be preserved in the output.
