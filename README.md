@@ -154,14 +154,19 @@ In **Polygon mode**, you provide the assets as footprint polygons. This mode is 
 {??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
 
 The ecosystem services provided are:
-- `coastal_risk_reduction_service`
-- `nitrogen_retention_service`
-- `sediment_retention_service`
-- `nature_access`
-- `endemic_biodiversity`
-- `redlist_species`
-- `species_richness`
-- `kba`
+- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast
+- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water
+- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water
+- `nature_access`: Number of people within 1 hour travel of every pixel
+- `kba_within_1km`: Indicates whether each pixel is within 1 km of a Key Biodiversity Area (KBA) or not
+
+For each service, the provided statistics are:
+- `max`: maximum service value within the asset footprint
+- `mean`: mean service value within the asset footprint
+- `sum`: sum of service values on each pixel within the asset footprint
+- `count`: number of pixels within the asset footprint that have data for the service
+- `nodata_count`: number of pixels within the asset_footprint that are missing for the service
+- `flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
 
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
