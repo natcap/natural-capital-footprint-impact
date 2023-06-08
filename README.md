@@ -28,7 +28,7 @@ The script requires that asset data is provided in a GDAL-supported vector forma
 1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. These fields are required when using both **Point mode** and **Buffer mode**.
 2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
 
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {SW: Add more information about what aggregation means and how it works}
+Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {??? Add more information about what aggregation means and how it works. ???}
 
 | latitude | longitude | category          | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
@@ -37,7 +37,7 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 
 *Table 1. Asset vector attribute table field requirements for Point mode and Buffer mode.*
 
-If you are running the script in **Polygon mode**, no specific fields are required by the script. {?? Is this true ??}
+If you are running the script in **Polygon mode**, no specific fields are required by the script. {??? Is this true ???}
 
 ## Data provided for you
 
@@ -73,7 +73,7 @@ You may modify or replace this table if you wish to use different ecosystem serv
 
 ## Installation
 
-{SW: Provide more information on needing to have git, conda etc installed.}
+{??? Provide more information on needing to have git, conda etc installed. ???}
 
 ```
 git clone https://github.com/natcap/natural-capital-footprint-impact.git
@@ -96,7 +96,7 @@ In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point*
 ```
 ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 ```
-This can also be done in QGIS with the Warp tool, and ArcGIS using the Project tool. Other projected coordinate systems may be used, such as UTM, as long as they are supported by GDAL (?? Emily, is this correct?)
+This can also be done in QGIS with the Warp tool, and ArcGIS using the Project tool. Other projected coordinate systems may be used, such as UTM, as long as they are supported by GDAL (??? Emily, is this correct ???)
 
 3. Run the workflow:
 ```
@@ -105,7 +105,7 @@ natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [-
 
 ## Modes of operation
 
-{SW: Add file naming requirements for footprint_results_path and company_results_path. Also provide an example for each mode.}
+{??? Add file naming requirements for footprint_results_path and company_results_path. Also provide an example for each mode. ???}
 
 ```
 usage: natural-capital-footprint-impact [-h] -e ECOSYSTEM_SERVICE_TABLE [-b BUFFER_TABLE]
@@ -153,7 +153,7 @@ Polygon data may be provided in a [GDAL-supported vector format](https://gdal.or
 
 ## Output formats
 
-{SW: Add details about the added fields - names, units, description, etc. An example for each would be good too.}
+{??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
 
 The ecosystem services provided are:
 - `coastal_risk_reduction_service`
