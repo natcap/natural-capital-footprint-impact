@@ -16,14 +16,14 @@ Asset location data is usually available as point coordinates (latitude/longitud
 
 ## Data you must provide
 
-### asset location data
+### asset vector
 
 The instructions below assume that you have the following information about each asset of interest:
-- its coordinate point location
+- its coordinate (latitude/longitude) point location
 - its category
 - its owner
 
-The tool requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). The vector layer contains an attribute table, where each row represents an asset. The following fields are used by the tool:
+The script requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). The vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
 1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. This field is required when using both **Point mode** and **Buffer mode**.
 2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
@@ -35,13 +35,13 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
 
-Table 1. User-provided asset data attibute table field requirements.
+*Table 1. User-provided asset data attibute table field requirements.*
 
 ## Data provided for you
 
 ### footprint data by asset category
 CSV (comma-separated value) table, where each row represents an asset category.
-The first column is named `category`. The category values will be cross-referenced with the categories in the asset table.
+The first column is named `category`. The category values will be cross-referenced with the categories in the asset table (Table 1).
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
 | category          | area           |
@@ -49,15 +49,15 @@ The second column is named `area`. This is the size (in square meters) of footpr
 | Bank Branch       | 549.7          |
 | ...               | ...            |
 
-Table 2. Script-provided facility category table, used for buffering point locations for different category types.
+*Table 2. Buffer table: Script-provided table with buffer distances defined by facility categories.*
 
-This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
+This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
 
 ### ecosystem service data
 CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
 - `es_id`: A text (string) identifier for the ecosystem service
-- `es_value_path`: Path to a geospatial raster map of the ecosystem service
+- `es_value_path`: File path to a geospatial raster map of the ecosystem service
 - `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged.
 
 | es_id    | es_value_path         | flag_threshold         |
@@ -65,11 +65,13 @@ Columns are:
 | sediment | gs://foo-sediment.tif | 123                    |
 | ...      | ...                   | ...                    |
 
-Table 3. Table defining the ecosystem service layers that will be used by the script.
+*Table 3. Ecosystem service table: defines the ecosystem service layers that will be used by the script.*
 
 You may modify or replace this table if you wish to use different ecosystem service data, but it must be in CSV format.
 
 ## Installation
+
+{SW: Provide more information on needing to have git, conda etc installed, and doing this on the command line.}
 
 ```
 git clone https://github.com/natcap/natural-capital-footprint-impact.git
@@ -80,7 +82,7 @@ pip install .
 The command `natural-capital-footprint-impact` should now be available.
 
 ## Workflow
-1. If your asset point data is in CSV format, convert it to a GDAL-supported vector format such as GPKG:
+1. If your asset point data is in CSV format, convert it to a GDAL-supported vector format such as GeoPackage (GPKG):
 ```
 ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:4326 -oo X_POSSIBLE_NAMES=longitude -oo Y_POSSIBLE_NAMES=latitude assets.gpkg assets.csv
 ```
@@ -96,7 +98,7 @@ This can also be done in QGIS with the Warp tool, and ArcGIS using the Project t
 
 3. Run the workflow:
 ```
-natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [--buffer-table BUFFER_TABLE] asset_vector
+natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [-b BUFFER_TABLE] asset_vector
 ```
 
 ## Modes of operation
@@ -115,9 +117,9 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -e ECOSYSTEM_SERVICE_TABLE, --ecosystem-service-table ECOSYSTEM_SERVICE_TABLE
-                        path to the ecosystem service table
+                        path to the ecosystem service table 
   -b BUFFER_TABLE, --buffer-table BUFFER_TABLE
-                        buffer points according to values in this table
+                        buffer asset points according to values in this table 
 ```
 
 
