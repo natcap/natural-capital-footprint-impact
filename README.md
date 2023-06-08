@@ -23,7 +23,13 @@ The instructions below assume that you have the following information about each
 - its category
 - its owner
 
-The script requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). The vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
+The script requires that asset data is provided in a GDAL-supported vector format (such as GeoPackage). 
+
+#### Point asset vector
+
+Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that there in the original vector attribute table will be preserved in the output.
+
+The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
 1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. These fields are required when using both **Point mode** and **Buffer mode**.
 2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
@@ -37,7 +43,12 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 
 *Table 1. Asset vector attribute table field requirements for Point mode and Buffer mode.*
 
-If you are running the script in **Polygon mode**, no specific fields are required by the script. {??? Is this true ???}
+
+#### Polygon asset vector
+
+Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that there in the original vector attribute table will be preserved in the output.
+
+If you are running the script in **Polygon mode**, no additional fields are required by the script. {??? Is this true ???}
 
 ## Data provided for you
 
@@ -148,11 +159,7 @@ In **Polygon mode**, you provide the assets as footprint polygons. This mode is 
 
 ## Input formats
 
-### point vector
-Point data may be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. No attributes are required. Any attributes that there are will be preserved in the output.
 
-### polygon vector
-Polygon data may be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that there are will be preserved in the output.
 
 ## Output formats
 
