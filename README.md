@@ -30,18 +30,18 @@ The script requires that asset data is provided in a GDAL-supported vector forma
 
 Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
-| latitude | longitude | facility_category | ultimate_parent_name    |
+| latitude | longitude | category          | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
 
-*Table 1. User-provided asset data attibute table field requirements.*
+*Table 1. Asset vector attribute table field requirements.*
 
 ## Data provided for you
 
 ### footprint data by asset category
 CSV (comma-separated value) table, where each row represents an asset category.
-The first column is named `category`. The category values will be cross-referenced with the categories in the asset table (Table 1).
+The first column is named `category`. The category values will be cross-referenced with the *category* field in the asset table (Table 1).
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
 | category          | area           |
@@ -49,7 +49,7 @@ The second column is named `area`. This is the size (in square meters) of footpr
 | Bank Branch       | 549.7          |
 | ...               | ...            |
 
-*Table 2. Buffer table: Script-provided table with buffer distances defined by facility categories.*
+*Table 2. Buffer table: footprint area modeled for each facility category, used in Buffer mode.*
 
 This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
 
@@ -102,6 +102,8 @@ natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [-
 ```
 
 ## Modes of operation
+
+{SW: Add file naming requirements for footprint_results_path and company_results_path. Also provide an example for each mode.}
 
 ```
 usage: natural-capital-footprint-impact [-h] -e ECOSYSTEM_SERVICE_TABLE [-b BUFFER_TABLE]
@@ -159,11 +161,12 @@ The ecosystem services provided are:
 - `species_richness`
 - `kba`
 
+{SW: Both of these need details about the added fields and what they mean. An example would be good too.}
+
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
 ### polygon vector
 **Buffer mode** and **Polygon mode** both produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
 
-{SW: Need to describe this attribute table}
 
