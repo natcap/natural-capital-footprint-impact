@@ -14,12 +14,12 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 ## Data you must provide
 The instructions below assume that you begin with the following information about the assets of interest:
 - its coordinate point location
-- its facility category
+- its category
 - its owner
 
 This data should be formatted into a table where each row represents an asset.
 Coordinate locations of each asset are in the `latitude` and `longitude` columns.
-The `facility_category` column determines footprint size. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
+The `category` column determines footprint size. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
 | latitude | longitude | facility_category | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
@@ -30,7 +30,7 @@ The `facility_category` column determines footprint size. Other attributes, like
 
 ### footprint data by asset category
 A table where each row represents an asset category.
-The first column is named after the asset category attribute. In this example, `facility_category` is used consistent with the S&P asset data.
+The first column is named `category`. The category values will be cross-referenced with the categories in the asset table.
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category.
 
 | facility_category | area |
@@ -45,11 +45,11 @@ Each row represents an ecosystem service.
 Columns are:
 - `es_id`: An identifier for the ecosystem service
 - `es_value_path`: Path to a global raster map of the ecosystem service
-- `es_flag_path`: Path to a global raster map of where to flag the ecosystem service. Values are binary (1 = flagged, 0 = not flagged)
+- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with a value greater than this threshold will be flagged.
 
-| es_id    | es_value_path         | es_flag_path           |
+| es_id    | es_value_path         | flag_threshold         |
 |----------|-----------------------|------------------------|
-| sediment | gs://foo-sediment.tif | gs://sediment-flag.tif |
+| sediment | gs://foo-sediment.tif | 123                    |
 | ...      | ...                   | ...                    |
 
 You may modify or replace this table if you wish to use different data.
