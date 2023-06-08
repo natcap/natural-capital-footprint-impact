@@ -6,16 +6,16 @@ Company footprint impact workflow (eventually to be made public)
 This script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
 Some useful definitions:
-- Asset: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, a restaurant, a cell tower, a hospital, a pipeline, or a billboard.
-- Footprint: The area on the earth surface taken up by an asset.
+- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, a restaurant, a cell tower, a hospital, a pipeline, or a billboard.
+- **Footprint**: The area on the earth surface taken up by an asset.
 
 Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset is usually not available. To account for differences in data availability, this tool can be used in three different ways:
-1. Assets are provided as latitude/longitude points. The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
-2. Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
-3. Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data are available. Statistics are calculated under each footprint.
+1. **Point mode**: Assets are provided as latitude/longitude points. The actual asset footprint is not known or modeled. Statistics are calculated under each point only.
+2. **Buffer mode**: Assets are provided as latitude/longitude points. The asset footprint is estimated by buffering (drawing a circle around) each point to a distance determined by the asset category. Statistics are calculated under each footprint.
+3. **Polygon mode**: Assets are provided as footprint polygons. This mode is preferred if actual asset footprint data are available. Statistics are calculated under each footprint.
 
 ## Data you must provide
-The instructions below assume that you begin with the following information about the assets of interest:
+The instructions below assume that you have the following information about each asset of interest:
 - its coordinate point location
 - its category
 - its owner
@@ -28,18 +28,20 @@ The `category` column determines footprint size. Footprint sizes vary widely, bu
 |----------|-----------|-------------------|-------------------------|
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
+Table 1. User-provided asset data attibute table field requirements.
 
 ## Data provided for you
 
 ### footprint data by asset category
 A table where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the categories in the asset table.
-The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category.
+The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
 | facility_category | area |
 |-------------------|----------------|
 | Bank Branch       | 549.7          |
 | ...               | ...            |
+Table 2. Script-provided facility category table, used for buffering point locations for different category types.
 
 This data was derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data.
 
@@ -54,8 +56,9 @@ Columns are:
 |----------|-----------------------|------------------------|
 | sediment | gs://foo-sediment.tif | 123                    |
 | ...      | ...                   | ...                    |
+Table 3. Table defining the ecosystem service layers that will be used by the script.
 
-You may modify or replace this table if you wish to use different data.
+You may modify or replace this table if you wish to use different ecosystem service data.
 
 ## Installation
 
@@ -109,20 +112,20 @@ options:
 ```
 
 
-### mode 1
+### Point mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path> <output vector path> <output table path>`
 
-In mode 1, you provide the assets as coordinate points. The asset footprint is not known or modeled. Statistics are calculated under each point only.
+In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Statistics are calculated under each point only.
 
-### mode 2
+### Buffer mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
 
-In mode 2, you provide the assets as coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category. Statistics are calculated under each footprint.
+In **Buffer mode**, you provide the assets as coordinate points. The asset footprint is modeled by buffering each point to a distance determined by the asset category. Statistics are calculated under each footprint.
 
-### mode 3
+### Polygon mode
 `natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
 
-In mode 3, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Statistics are calculated under each footprint.
+In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Statistics are calculated under each footprint.
 
 
 ## Input formats
@@ -135,7 +138,7 @@ Polygon data may be provided in a [GDAL-supported vector format](https://gdal.or
 
 ## Output formats
 
-The ecosystem services are:
+The ecosystem services provided are:
 - `coastal_risk_reduction_service`
 - `nitrogen_retention_service`
 - `sediment_retention_service`
@@ -146,8 +149,10 @@ The ecosystem services are:
 - `kba`
 
 ### CSV and point vector
-Mode 1 produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
+**Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
 ### polygon vector
-Modes 2 and 3 produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
+**Buffer mode** and **Polygon mode** both produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
+
+{SW: Need to describe this attribute table}
 
