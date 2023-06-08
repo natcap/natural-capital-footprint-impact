@@ -149,11 +149,6 @@ In **Buffer mode**, you provide the assets as latitude/longitude coordinate poin
 
 In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Statistics are calculated under each footprint.
 
-
-## Input formats
-
-
-
 ## Output formats
 
 {??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
