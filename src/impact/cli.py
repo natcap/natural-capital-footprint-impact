@@ -4,7 +4,7 @@ import os
 import sys
 import tempfile
 
-from .src import point_stats, point_flags, \
+from .src import point_stats, \
     buffer_points, footprint_stats, aggregate_points, aggregate_footprints
 
 logger = logging.getLogger()
@@ -50,7 +50,6 @@ def main():
                 footprint_gdf = footprint_stats(tmp_footprint_path, args.ecosystem_service_table)
         else:
             point_gdf = point_stats(args.asset_vector, args.ecosystem_service_table)
-            point_gdf = point_flags(point_gdf, args.ecosystem_service_table)
             point_gdf.to_file(results_path)
             aggregate_points(point_gdf)
     else:

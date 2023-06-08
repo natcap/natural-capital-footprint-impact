@@ -2,21 +2,15 @@ import math
 import os
 import sys
 
-from osgeo import ogr, gdal
-import geopandas
+import geopandas as gpd
 import logging
 import numpy
-import pandas
+from osgeo import ogr, gdal
+import pandas as pd
 import pygeoprocessing
 import rasterio
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(formatter)
-handler.setLevel(logging.DEBUG)
-logger.addHandler(handler)
 
 def point_stats(point_path, es_table_path, id_col='es_id'):
     """Find and record ecosystem service values under points.
@@ -25,20 +19,19 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
     https://geopandas.org/en/stable/gallery/geopandas_rasterio_sample.html
 
     Args:
-        point_gdf (geopandas.GeoDataframe):
+        point_gdf (gpd.GeoDataframe):
         out_path (str):
 
     Returns:
         None
     """
     # for each ecosystem services layer
-    # get the pixel value under each point.
+    # use rasterio sample to get the pixel value under each point.
     # this is done with rasterio sample
     # we must first convert points to the raster CRS to use rasterio sample
     # 
-
     logger.info('retrieving values under points...')
-    point_gdf = geopandas.read_file(point_path)
+    point_gdf = gpd.read_file(point_path)
 
     if not (point_gdf.geom_type == 'Point').all():
         raise ValueError('All geometries in the asset vector must be points')
@@ -51,56 +44,19 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
         )
     ]
     
-    es_df = pandas.read_csv(es_table_path)
-    es_raster_dict = {row[id_col]: row['es_value_path'] for _, row in es_df.iterrows()}
-    for es_id, es_raster_path in es_raster_dict.items():
-        es_raster_path = os.path.abspath(
-            os.path.join(os.path.dirname(es_table_path), es_raster_path))
-        es_dataset = rasterio.open(es_raster_path)
+    for _, row in pd.read_csv(es_table_path).iterrows():
+        es_id = row[id_col]
+        es_dataset = rasterio.open(
+            os.path.abspath(os.path.join(
+                os.path.dirname(es_table_path), row['es_value_path'])))
+
         # get the pixel value under each point
         point_values = numpy.ma.MaskedArray(
             list(es_dataset.sample(coord_list, masked=True)))
         point_values[point_values is masked] = numpy.nan
+
         point_gdf[es_id] = point_values
-
-    return point_gdf
-
-
-def point_flags(point_gdf, es_table_path, id_col='es_id'):
-    """Flag footprints that overlap flagged pixels for each ecosystem service.
-
-    Args:
-        footprint_path (str): path to a GDAL-supported footprint polygon vector
-        es_table_path (str): path to the ecosystem service CSV, which should
-            have the following columns: es_id (the unique identifier for
-            each ecosystem service), and flag_path (the path to a binary raster
-            indicating pixels that are significant or exceed a threshold)
-
-    Returns:
-        GeoDataFrame with a binary '<es_id>_flag' column for each ecosystem
-        service.
-    """
-    logger.info('calculating statistics under footprints...')
-    # get list of (x, y) points
-    coord_list = [
-        (x,y) for x,y in zip(
-            point_gdf['geometry'].x ,
-            point_gdf['geometry'].y
-        )
-    ]
-
-    es_df = pandas.read_csv(es_table_path)
-    es_raster_dict = {row[id_col]: row['es_flag_path'] for _, row in es_df.iterrows()}
-
-    for es_id, es_raster_path in es_raster_dict.items():
-        es_raster_path = os.path.abspath(
-            os.path.join(os.path.dirname(es_table_path), es_raster_path))
-        es_dataset = rasterio.open(es_raster_path)
-        # get the pixel value under each point
-        point_values = numpy.ma.MaskedArray(
-            list(es_dataset.sample(coord_list, masked=True)))
-        point_values[point_values is masked] = numpy.nan
-        point_gdf[f'es_id_{flag}'] = point_values > 0
+        point_gdf[f'{es_id}_flag'] = point_values > row['flag_threshold']
 
     return point_gdf
 
@@ -121,38 +77,29 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
         None
     """
     logger.info('calculating statistics under footprints...')
-    footprint_gdf = geopandas.read_file(
+    footprint_gdf = gpd.read_file(
         footprint_path, engine='pyogrio', fid_as_index=True)
 
-    if not (footprint_gdf.geom_type == 'Polygon').all():
-        raise ValueError('All geometries in the asset vector must be polygons')
-    
-    es_df = pandas.read_csv(es_table_path)
-    value_raster_dict = {row[id_col]: row['es_value_path'] for _, row in es_df.iterrows()}
-    flag_raster_dict = {row[id_col]: row['es_flag_path'] for _, row in es_df.iterrows()}
-    fid_series = footprint_gdf.index.to_series()
+    if not ((footprint_gdf.geom_type == 'Polygon') |
+            (footprint_gdf.geom_type == 'MultiPolygon')).all():
+        print(footprint_gdf.geom_type.unique())
+        raise ValueError('All geometries in the asset vector must be polygons or multipolygons')
 
-    stats = ['min', 'max', 'sum', 'count', 'nodata_count']
-    for es_id, value_raster_path in value_raster_dict.items():
-        value_raster_path = os.path.abspath(
-            os.path.join(os.path.dirname(es_table_path), value_raster_path))
+    stats = ['max', 'sum', 'count', 'nodata_count']
+    for _, row in pd.read_csv(es_table_path).iterrows():
+        es_id = row[id_col]
         zonal_stats = pygeoprocessing.zonal_statistics(
-            (value_raster_path, 1), footprint_path)
+            (os.path.abspath(os.path.join(os.path.dirname(es_table_path),
+                                          row['es_value_path'])), 1),
+            footprint_path)
 
         for stat in stats:
-            stat_series = pandas.Series(
-                fid_series.map(lambda fid: zonal_stats[fid][stat]))
-            footprint_gdf[f'{es_id}_{stat}'] = stat_series
+            footprint_gdf[f'{es_id}_{stat}'] = pd.Series(
+                footprint_gdf.index.to_series().map(
+                    lambda fid: zonal_stats[fid][stat]))
 
-    for es_id, flag_raster_path in flag_raster_dict.items():
-        flag_raster_path = os.path.abspath(
-            os.path.join(os.path.dirname(es_table_path), flag_raster_path))
-        zonal_stats = pygeoprocessing.zonal_statistics(
-            (flag_raster_path, 1), footprint_path)
-
-        flag_series = pandas.Series(
-            fid_series.map(lambda fid: zonal_stats[fid]['sum'] > 0))
-        footprint_gdf[f'{es_id}_flag'] = flag_series
+        footprint_gdf[f'{es_id}_flag'] = (
+            footprint_gdf[f'{es_id}_max'] > row['flag_threshold'])
 
     return footprint_gdf
 
@@ -186,18 +133,18 @@ def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_
             that are not found in the buffer table
     """
     logger.info('buffering points to create footprints...')
-    gdf = geopandas.read_file(point_vector_path)
+    gdf = gpd.read_file(point_vector_path)
     if not (gdf.geom_type == 'Point').all():
         raise ValueError('All geometries in the asset vector must be points')
 
-    buffer_df = pandas.read_csv(buffer_csv_path)
+    buffer_df = pd.read_csv(buffer_csv_path)
 
     point_categories = set(gdf[attr].unique())
     buffer_categories = set(buffer_df[attr].unique())
-    if point_categories - buffer_categories:
-        raise ValueError(
-            f'The following values of "{attr}" were found in the asset vector '
-            f'but not the buffer table: {point_categories - buffer_categories}')
+    # if point_categories - buffer_categories:
+    #     raise ValueError(
+    #         f'The following values of "{attr}" were found in the asset vector '
+    #         f'but not the buffer table: {point_categories - buffer_categories}')
 
     for _, row in buffer_df.iterrows():
         # calculate the radius needed to draw a circle that has the given area
@@ -229,7 +176,7 @@ def aggregate_footprints(gdf, out_path, aggregate_by):
     for company in vals:
         company_rows = gdf[gdf[aggregate_by] == company]
         results[company] = {}
-        total_flags = pandas.Series([False for _ in range(company_rows.shape[0])])
+        total_flags = pd.Series([False for _ in range(company_rows.shape[0])])
         for es_id in es_ids:
 
             # company assets that overlap this ecosystem service
@@ -275,7 +222,7 @@ def aggregate_footprints(gdf, out_path, aggregate_by):
         results[company]['percent_total_flagged'] = (
             results[company]['total_flags'] / results[company]['total_assets'] * 100)
 
-    df = pandas.DataFrame(results).T
+    df = pd.DataFrame(results).T
     df.to_csv(out_path)
 
 
@@ -291,7 +238,7 @@ def aggregate_points(footprint_path, out_path, aggregate_by):
         None
     """
     logger.info('aggregating...')
-    gdf = geopandas.read_file(footprint_path)
+    gdf = gpd.read_file(footprint_path)
     es_ids = [x[:-4] for x in gdf.columns if x.endswith('sum')]
     results = {}
     vals = gdf[aggregate_by].unique()
@@ -339,7 +286,7 @@ def aggregate_points(footprint_path, out_path, aggregate_by):
         # total number of assets per company (whether overlapping data or not)
         results[company]['total_assets'] = company_rows.shape[0]
 
-    df = pandas.DataFrame(results).T
+    df = pd.DataFrame(results).T
     for es_id in es_ids:
         for col in [f'{es_id}_assets', f'{es_id}_count_mean>90th',
                     f'{es_id}_count_max>90th', 'total_assets']:
