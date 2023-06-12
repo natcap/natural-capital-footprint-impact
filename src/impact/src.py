@@ -10,7 +10,63 @@ import pandas as pd
 import pygeoprocessing
 import rasterio
 
+import taskgraph
+
 logger = logging.getLogger()
+
+
+def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_area'):
+    """Buffer points according to a given attribute.
+
+    For a given row in `gdf`, `row['geometry']` will be buffered to form a
+    regular polygon approximating a circle. Its area is equal to
+    `buffer_df[row[attr]]`.
+
+    For example, suppose your attribute is called 'facility_category'. Then
+    the point vector attribute table should contain a `facility_category`
+    column.
+
+    Args:
+        point_vector_path: path to a GDAL-supported point vector
+        buffer_csv_path: maps attribute values to footprint areas.
+            must contain two columns: `facility_category` and 'footprint_area'.
+            areas must be provided in square meters.
+        attr:
+
+    Returns:
+        a copy of the input geodataframe, where each row's `geometry` has been
+        replaced with a circular footprint
+
+    Raises:
+        ValueError if any geometry in the vector is not a point
+
+        ValueError if there are `facility_category` values in the point vector
+            that are not found in the buffer table
+    """
+    logger.info('buffering points to create footprints...')
+    gdf = gpd.read_file(point_vector_path)
+    if not (gdf.geom_type == 'Point').all():
+        raise ValueError('All geometries in the asset vector must be points')
+
+    buffer_df = pd.read_csv(buffer_csv_path)
+
+    point_categories = set(gdf[attr].unique())
+    buffer_categories = set(buffer_df[attr].unique())
+    if point_categories - buffer_categories:
+        raise ValueError(
+            f'The following values of "{attr}" were found in the asset vector '
+            f'but not the buffer table: {point_categories - buffer_categories}')
+
+    for _, row in buffer_df.iterrows():
+        # calculate the radius needed to draw a circle that has the given area
+        buffer_radius = math.sqrt(row[area_col] / math.pi)
+        mask = gdf[attr] == row[attr]
+        # draw a polygon that approximates a circle
+        matches = gdf[mask]
+        gdf.loc[mask, 'geometry'] = gdf.loc[mask, 'geometry'].buffer(buffer_radius)
+
+    return gdf
+
 
 def point_stats(point_path, es_table_path, id_col='es_id'):
     """Find and record ecosystem service values under points.
@@ -76,85 +132,50 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
     Returns:
         None
     """
+    graph = taskgraph.TaskGraph(os.path.dirname(__file__), n_workers=8)
+
     logger.info('calculating statistics under footprints...')
     footprint_gdf = gpd.read_file(
         footprint_path, engine='pyogrio', fid_as_index=True)
 
     if not ((footprint_gdf.geom_type == 'Polygon') |
             (footprint_gdf.geom_type == 'MultiPolygon')).all():
-        print(footprint_gdf.geom_type.unique())
         raise ValueError('All geometries in the asset vector must be polygons or multipolygons')
 
     stats = ['max', 'sum', 'count', 'nodata_count']
+    es_id_to_task = {}
     for _, row in pd.read_csv(es_table_path).iterrows():
         es_id = row[id_col]
-        zonal_stats = pygeoprocessing.zonal_statistics(
-            (os.path.abspath(os.path.join(os.path.dirname(es_table_path),
-                                          row['es_value_path'])), 1),
-            footprint_path)
+
+        es_id_to_task[es_id] = graph.add_task(
+            func=pygeoprocessing.zonal_statistics,
+            args=(
+                (os.path.abspath(os.path.join(os.path.dirname(es_table_path), row['es_value_path'])), 1),
+                footprint_path),
+            target_path_list=[],
+            task_name=f'{es_id} stats',
+            store_result=True)
+
+    graph.close()
+    graph.join()
+
+    for _, row in pd.read_csv(es_table_path).iterrows():
+        es_id = row[id_col]
+
+        zonal_stats = es_id_to_task[es_id].get()
 
         for stat in stats:
             footprint_gdf[f'{es_id}_{stat}'] = pd.Series(
                 footprint_gdf.index.to_series().map(
                     lambda fid: zonal_stats[fid][stat]))
 
+        footprint_gdf.loc[footprint_gdf[f'{es_id}_count'] > 0, f'{es_id}_mean'] = (
+            footprint_gdf[f'{es_id}_sum'] / footprint_gdf[f'{es_id}_count'])
+
         footprint_gdf[f'{es_id}_flag'] = (
             footprint_gdf[f'{es_id}_max'] > row['flag_threshold'])
 
     return footprint_gdf
-
-
-def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_area'):
-    """Buffer points according to a given attribute.
-    
-    For a given row in `gdf`, `row['geometry']` will be buffered to form a
-    regular polygon approximating a circle. Its area is equal to
-    `buffer_df[row[attr]]`.
-
-    For example, suppose your attribute is called 'facility_category'. Then
-    the point vector attribute table should contain a `facility_category`
-    column.
-    
-    Args:
-        point_vector_path: path to a GDAL-supported point vector
-        buffer_csv_path: maps attribute values to footprint areas.
-            must contain two columns: `facility_category` and 'footprint_area'.
-            areas must be provided in square meters.
-        attr:
-    
-    Returns:
-        a copy of the input geodataframe, where each row's `geometry` has been 
-        replaced with a circular footprint
-        
-    Raises:
-        ValueError if any geometry in the vector is not a point
-
-        ValueError if there are `facility_category` values in the point vector
-            that are not found in the buffer table
-    """
-    logger.info('buffering points to create footprints...')
-    gdf = gpd.read_file(point_vector_path)
-    if not (gdf.geom_type == 'Point').all():
-        raise ValueError('All geometries in the asset vector must be points')
-
-    buffer_df = pd.read_csv(buffer_csv_path)
-
-    point_categories = set(gdf[attr].unique())
-    buffer_categories = set(buffer_df[attr].unique())
-    # if point_categories - buffer_categories:
-    #     raise ValueError(
-    #         f'The following values of "{attr}" were found in the asset vector '
-    #         f'but not the buffer table: {point_categories - buffer_categories}')
-
-    for _, row in buffer_df.iterrows():
-        # calculate the radius needed to draw a circle that has the given area
-        buffer_radius = math.sqrt(row[area_col] / math.pi)
-        mask = gdf[attr] == row[attr]
-        # draw a polygon that approximates a circle
-        matches = gdf[mask]
-        gdf.loc[mask, 'geometry'] = gdf.loc[mask, 'geometry'].buffer(buffer_radius)
-
-    return gdf
 
 
 def aggregate_footprints(gdf, out_path, aggregate_by):

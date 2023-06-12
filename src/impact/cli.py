@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import tempfile
+import pandas as pd
 
 from .src import point_stats, \
     buffer_points, footprint_stats, aggregate_points, aggregate_footprints
@@ -36,6 +37,14 @@ def main():
     parser.add_argument('company_results_path',
                         help='path to write out the aggregated results table')
     args = parser.parse_args()
+
+    # Make sure that all the ES layer paths are valid
+    df = pd.read_csv(args.ecosystem_service_table)
+    for _, row in pd.read_csv(args.ecosystem_service_table).iterrows():
+        path = os.path.abspath(os.path.join(
+                os.path.dirname(args.ecosystem_service_table),
+                row['es_value_path']))
+        assert os.path.exists(path)
 
     if args.buffer_table and args.mode == 'polygons':
         raise ValueError('Cannot use a buffer table in polygon mode')
