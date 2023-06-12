@@ -6,11 +6,11 @@ Company footprint impact workflow (eventually to be made public)
 This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
 The ecosystem services provided are:
-- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast
-- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water
-- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water
-- `nature_access`: Number of people within 1 hour travel of every pixel
-- `kba_within_1km`: Indicates whether each pixel is within 1 km of a Key Biodiversity Area (KBA) or not
+- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit.
+- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
+- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
+- `nature_access`: The number of people within 1 hour travel of every pixel. Population is from Landscan 2019.
+- `kba_within_1km`: Binary 0 or 1 value, indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. KBAs are from BirdLife International (2019).
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -191,5 +191,10 @@ The output company table contains
 
 ### polygon vector
 **Buffer mode** and **Polygon mode** both produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
+
+
+## References
+
+BirdLife International (2019). Digital boundaries of Key Biodiversity Areas from the World Database of Key Biodiversity Areas. Developed by the KBA Partnership: BirdLife International, International Union for the Conservation of Nature, Amphibian Survival Alliance, Conservation International, Critical Ecosystem Partnership Fund, Global Environment Facility, Global Wildlife Conservation, NatureServe, Rainforest Trust, Royal Society for the Protection of Birds, Wildlife Conservation Society and World Wildlife Fund. September 2019 Version. Available at http://www.keybiodiversityareas.org/site/requestgis. 
 
 
