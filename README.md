@@ -197,4 +197,7 @@ The output company table contains
 
 BirdLife International (2019). Digital boundaries of Key Biodiversity Areas from the World Database of Key Biodiversity Areas. Developed by the KBA Partnership: BirdLife International, International Union for the Conservation of Nature, Amphibian Survival Alliance, Conservation International, Critical Ecosystem Partnership Fund, Global Environment Facility, Global Wildlife Conservation, NatureServe, Rainforest Trust, Royal Society for the Protection of Birds, Wildlife Conservation Society and World Wildlife Fund. September 2019 Version. Available at http://www.keybiodiversityareas.org/site/requestgis. 
 
+Oak Ridge National Laboratory. East View Cartographic, Inc. LandScan 2019 global population database. East View Cartographic, Inc.
+
+
 
