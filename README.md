@@ -6,11 +6,11 @@ Company footprint impact workflow (eventually to be made public)
 This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
 The ecosystem services provided are:
-- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit.
-- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
-- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
-- `nature_access`: The number of people within 1 hour travel of every pixel. Population is from Landscan 2019.
-- `kba_within_1km`: Binary 0 or 1 value, indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. KBAs are from BirdLife International (2019).
+- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit.
+- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
+- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
+- `nature_access`: The number of people within 1 hour travel of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019.
+- `kba_within_1km`: Value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. Data created for a study by Damania et al. (2023). KBAs are from BirdLife International (2019). {??? Emily, are your values binary 0/1 or something else ???}
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -196,6 +196,10 @@ The output company table contains
 ## References
 
 BirdLife International (2019). Digital boundaries of Key Biodiversity Areas from the World Database of Key Biodiversity Areas. Developed by the KBA Partnership: BirdLife International, International Union for the Conservation of Nature, Amphibian Survival Alliance, Conservation International, Critical Ecosystem Partnership Fund, Global Environment Facility, Global Wildlife Conservation, NatureServe, Rainforest Trust, Royal Society for the Protection of Birds, Wildlife Conservation Society and World Wildlife Fund. September 2019 Version. Available at http://www.keybiodiversityareas.org/site/requestgis. 
+
+Chaplin-Kramer, R. and Sharp., R.P. Nature’s Contributions to People under Potential Natural Vegetation. (Unpublished dataset). Based on models described in Chaplin-Kramer, R., Neugarten, R. A., Sharp, R. P., Collins, P. M., Polasky, S., Hole, D., et al. (2023). Mapping the planet’s critical natural assets. Nature Ecology & Evolution, 7(1), 51-61.
+
+Damania, R., Polasky, S., Ruckelshaus, M., Russ, J., Amann, M., Chaplin-Kramer, R., Gerber, J. Hawthorne, P., Heger, M., Saleh Mamun, Ruta, G., Schmitt, R., Smith, J., Vogl, A. Wagner, F., and Zaveri, E. (2023). Nature’s Frontiers: Achieving Sustainability, Efficiency, and Prosperity with Natural Capital. Environment and Sustainable Development series. Washington, DC: World Bank. In press.
 
 Oak Ridge National Laboratory. East View Cartographic, Inc. LandScan 2019 global population database. East View Cartographic, Inc.
 
