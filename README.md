@@ -9,7 +9,7 @@ The ecosystem services provided are:
 - `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit.
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
-- `nature_access`: The number of people within 1 hour travel of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019.
+- `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019.
 - `kba_within_1km`: Value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. Data created for a study by Damania et al. (2023). KBAs are from BirdLife International (2019). {??? Emily, are your values binary 0/1 or something else ???}
 
 Some useful definitions:
@@ -27,33 +27,33 @@ Asset location data is usually available as point coordinates (latitude/longitud
 
 #### Point asset vector
 
-Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that there in the original vector attribute table will be preserved in the output.
+Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that exist in the original vector attribute table will be preserved in the output.
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
 1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. These fields are required when using both **Point mode** and **Buffer mode**.
 2. The `category` column determines footprint size. This field is required when using **Buffer mode** only. 
 
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). We categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {??? Add more information about what aggregation means and how it works. ???}
+Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {??? Add more information about what aggregation means and how it works. ???}
 
 | latitude | longitude | category          | ultimate_parent_name    |
 |----------|-----------|-------------------|-------------------------|
 | 81.07    | 33.55     | Bank Branch       | XYZ Corp                |
 | ...      | ...       | ...               | ...                     |
 
-*Table 1. Asset vector attribute table field requirements for Point mode and Buffer mode.*
+*Table 1. Asset vector attribute table field requirements and example values for Point mode and Buffer mode.*
 
 
 #### Polygon asset vector
 
-Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that there in the original vector attribute table will be preserved in the output.
+Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
 
 If you are running the script in **Polygon mode**, no additional fields are required by the script. {??? Is this true ???}
 
 ## Data provided for you
 
 ### footprint data by asset category
-CSV (comma-separated value) table, where each row represents an asset category.
+Footprint data is defined in a CSV (comma-separated value) table, where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the *category* field in the asset table (Table 1).
 The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
@@ -64,12 +64,12 @@ The second column is named `area`. This is the size (in square meters) of footpr
 
 *Table 2. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
 
-The provided footprint areas were derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format.
+The provided footprint areas were derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format, and include the required `category` and `area` fields.
 
 ### ecosystem service data
-CSV (comma-separated value) table, where each row represents an ecosystem service.
+Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
-- `es_id`: A text (string) identifier for the ecosystem service
+- `es_id`: A unique text (string) identifier for the ecosystem service {??? Emily, are there any requirements for this? Is it used in the output ???}
 - `es_value_path`: File path to a geospatial raster map of the ecosystem service {??? File type requirements ???}
 - `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. {??? is this a number? how is it determined? Need to explain flags in more detail. ???}
 
@@ -80,7 +80,7 @@ Columns are:
 
 *Table 3. Ecosystem service table: defines the ecosystem service layers that will be used by the script.*
 
-You may modify or replace this table if you wish to use different ecosystem service data, but it must be in CSV format.
+You may modify or replace this table if you wish to use different ecosystem service data, but it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold` fields.
 
 ## Installation
 
