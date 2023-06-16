@@ -69,7 +69,7 @@ The provided footprint areas were derived by manually estimating the footprint a
 ### ecosystem service data
 Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
-- `es_id`: A unique text (string) identifier for the ecosystem service {??? Emily, are there any requirements for this? Is it used in the output ???}
+- `es_id`: A unique text (string) identifier for the ecosystem service {??? Emily, are there any requirements for this? Is it used in the output? Coordinate this language with the footprint statistics vector explanation below. ???}
 - `es_value_path`: File path to a geospatial raster map of the ecosystem service {??? File type requirements ???}
 - `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. {??? is this a number? how is it determined? Need to explain flags in more detail. ???}
 
@@ -144,45 +144,48 @@ options:
 ### Point mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path> <output vector path> <output table path>`
 
-In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Statistics are calculated under each point only.
+In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 
 ### Buffer mode
 `natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
 
-In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Statistics are calculated under each footprint.
+In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Ecosystem service statistics are calculated under each footprint.
 
 ### Polygon mode
 `natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
 
-In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Statistics are calculated under each footprint.
+In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Ecosystem service statistics are calculated under each footprint.
 
 ## Output formats
 
 {??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
 
 ### Footprint statistics vector
-The output vector attribute table contains 30 columns named `<service>_<statistic>`, for each combination of the 5 ecosystem services and these 6 statistics:
+The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<service>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
 
 - `max`: maximum service value within the asset footprint
 - `mean`: mean service value within the asset footprint
 - `sum`: sum of service values on each pixel within the asset footprint
 - `count`: number of pixels within the asset footprint that have data for the service
-- `nodata_count`: number of pixels within the asset_footprint that are missing for the service
+- `nodata_count`: number of pixels within the asset footprint that are missing data for the service
 - `flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
+
+If the ecosystem service table has been modified with a different number of services, then the 6 statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
 
 ### Company statistics table
 The output company table contains 
+{??? Again, is "es_id" is used for "service" below? If so, make this explicit here, note in the ecosystem service table section, and make consistent throughout the doc. ???}
 
-- `<service>_sum`: Sum of natural capital values under asset footprints for each service
-- `<service>_mean`: Mean of natural capital values under asset footprints
+- `<service>_sum`: Sum of each ecosystem service under asset footprints for each service
+- `<service>_mean`: Mean of each ecosystem service under asset footprints
 - `<service>_assets`: For each service, the number of assets with data
-- `<service>_area`: total area of asset footprints per company that are overlapping data for each service
+- `<service>_area`: Total area of asset footprints per company that are overlapping data for each service
 - `<service>_flags`: For each service, the number of assets flagged
 - `percent_<service>_flagged`:  For each service, the percent of assets flagged
 - `total_assets`: Total number of assets belonging to each company
 - `total_area`: Total area of asset footprints belonging to each company
 - `total_flags`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
-- `percent_total_flagged`: Percent of assets flagged in any category With and without nature access
+- `percent_total_flagged`: Percent of assets flagged in any category 
 
 
 
