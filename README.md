@@ -10,10 +10,10 @@ The ecosystem services provided are:
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019.
-- `kba_within_1km`: Value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. Data created for a study by Damania et al. (2023). KBAs are from BirdLife International (2019). {??? Emily, are your values binary 0/1 or something else ???}
+- `kba_within_1km`: Value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). {??? Emily, are your values binary 0/1 or something else ???}
 
 Some useful definitions:
-- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as an office, restaurant, cell tower, hospital, pipeline, or billboard.
+- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
 - **Footprint**: The area on the earth surface taken up by an asset.
 
 Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this script can be used in three different ways:
