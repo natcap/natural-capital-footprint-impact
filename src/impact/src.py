@@ -1,6 +1,9 @@
+import argparse
+import logging
 import math
 import os
 import sys
+import tempfile
 
 import geopandas as gpd
 import logging
@@ -9,22 +12,25 @@ from osgeo import ogr, gdal
 import pandas as pd
 import pygeoprocessing
 import rasterio
-
 import taskgraph
 
+
+
 logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(formatter)
+handler.setLevel(logging.DEBUG)
+logger.addHandler(handler)
 
 
 def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_area'):
     """Buffer points according to a given attribute.
 
-    For a given row in `gdf`, `row['geometry']` will be buffered to form a
-    regular polygon approximating a circle. Its area is equal to
+    Each feature in the point vector will be buffered to form a regular polygon
+    approximating a circle. Its area is equal to
     `buffer_df[row[attr]]`.
-
-    For example, suppose your attribute is called 'facility_category'. Then
-    the point vector attribute table should contain a `facility_category`
-    column.
 
     Args:
         point_vector_path: path to a GDAL-supported point vector
@@ -71,8 +77,7 @@ def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_
 def point_stats(point_path, es_table_path, id_col='es_id'):
     """Find and record ecosystem service values under points.
 
-    Based off of this example:
-    https://geopandas.org/en/stable/gallery/geopandas_rasterio_sample.html
+
 
     Args:
         point_gdf (gpd.GeoDataframe):
@@ -81,11 +86,9 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
     Returns:
         None
     """
-    # for each ecosystem services layer
-    # use rasterio sample to get the pixel value under each point.
-    # this is done with rasterio sample
-    # we must first convert points to the raster CRS to use rasterio sample
-    # 
+    # for each ecosystem services layer, use rasterio sample to get the pixel
+    # value under each point. based off of this example:
+    # https://geopandas.org/en/stable/gallery/geopandas_rasterio_sample.html
     logger.info('retrieving values under points...')
     point_gdf = gpd.read_file(point_path)
 
@@ -95,13 +98,14 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
     # get list of (x, y) points
     coord_list = [
         (x,y) for x,y in zip(
-            point_gdf['geometry'].x ,
+            point_gdf['geometry'].x,
             point_gdf['geometry'].y
         )
     ]
     
     for _, row in pd.read_csv(es_table_path).iterrows():
         es_id = row[id_col]
+        # evaluate path relative to the ES table location
         es_dataset = rasterio.open(
             os.path.abspath(os.path.join(
                 os.path.dirname(es_table_path), row['es_value_path'])))
@@ -117,7 +121,7 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
     return point_gdf
 
 
-def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
+def footprint_stats(footprint_path, es_table_path, id_col='es_id', n_workers=-1):
     """Calculate and record stats of ecosystem service values under footprints.
 
     Args:
@@ -132,7 +136,7 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id'):
     Returns:
         None
     """
-    graph = taskgraph.TaskGraph(os.path.dirname(__file__), n_workers=8)
+    graph = taskgraph.TaskGraph(os.getcwd(), n_workers=n_workers)
 
     logger.info('calculating statistics under footprints...')
     footprint_gdf = gpd.read_file(
@@ -292,16 +296,6 @@ def aggregate_points(footprint_path, out_path, aggregate_by):
             # total number of assets per company that are overlapping data
             results[company][f'{es_id}_assets'] = valid_company_rows.shape[0]
 
-            # number of assets whose mean value is above the 90th percentile
-            results[company][f'{es_id}_count_mean>90th'] = numpy.sum(
-                valid_company_rows[f'mean_{es_id}_percentile'] > 90)
-            # number of assets whose max value is above the 90th percentile
-            results[company][f'{es_id}_count_max>90th'] = numpy.sum(
-                valid_company_rows[f'max_{es_id}_percentile'] > 90)
-            # percent of assets whose mean value is above the 90th percentile
-            results[company][f'{es_id}_%_mean>90th'] = numpy.sum(
-                valid_company_rows[f'mean_{es_id}_percentile'] > 90) / company_rows.shape[0] * 100
-
         # total area of asset footprints per company (overlapping data or not)
         results[company]['total_area'] = company_rows['geometry'].area.sum()
         # total number of assets per company (whether overlapping data or not)
@@ -309,8 +303,69 @@ def aggregate_points(footprint_path, out_path, aggregate_by):
 
     df = pd.DataFrame(results).T
     for es_id in es_ids:
-        for col in [f'{es_id}_assets', f'{es_id}_count_mean>90th',
-                    f'{es_id}_count_max>90th', 'total_assets']:
+        for col in [f'{es_id}_assets', 'total_assets']:
             df[col] = df[col].astype(int)
     df.to_csv(out_path, float_format='%.5f')
+
+aggregate_by = 'ultimate_parent_name'
+attr = 'facility_category'
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--ecosystem-service-table', required=True,
+                        help='path to the ecosystem service table')
+    parser.add_argument('mode', choices=['points', 'polygons'],
+                        help=(
+                            'mode of operation. in points mode, the asset vector '
+                            'contains point geometries. in polygons mode, it contains '
+                            'polygon geometries.'))
+    parser.add_argument('-b', '--buffer-table',
+                        help='buffer points according to values in this table')
+    parser.add_argument('asset_vector',
+                        help='path to the asset vector')
+    parser.add_argument('footprint_results_path',
+                        help='path to write out the asset results vector')
+    parser.add_argument('company_results_path',
+                        help='path to write out the aggregated results table')
+    parser.add_argument('-n', '--n-workers', default=-1,
+                        help='number of parallel subprocess workers to use. '
+                             '0 = no subprocesses.  Set >0 '
+                             'to parallelize.')
+    args = parser.parse_args()
+
+    # Make sure that all the ES layer paths are valid
+    df = pd.read_csv(args.ecosystem_service_table)
+    for _, row in pd.read_csv(args.ecosystem_service_table).iterrows():
+        path = os.path.abspath(os.path.join(
+                os.path.dirname(args.ecosystem_service_table),
+                row['es_value_path']))
+        assert os.path.exists(path)
+
+    if args.buffer_table and args.mode == 'polygons':
+        raise ValueError('Cannot use a buffer table in polygon mode')
+
+    graph = taskgraph.TaskGraph(os.path.dirname(__file__), n_workers=8)
+
+    if args.mode == 'points':
+        if args.buffer_table:
+            footprint_gdf = buffer_points(args.asset_vector, args.buffer_table, attr, 'area')
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_footprint_path = os.path.join(tmpdir, 'footprints.gpkg')
+                footprint_gdf.to_file(tmp_footprint_path, driver='GPKG', layer='footprints')
+
+                footprint_gdf = footprint_stats(tmp_footprint_path, args.ecosystem_service_table)
+        else:
+            point_gdf = point_stats(args.asset_vector, args.ecosystem_service_table)
+            point_gdf.to_file(results_path)
+            aggregate_points(point_gdf)
+    else:
+        footprint_gdf = footprint_stats(args.asset_vector, args.ecosystem_service_table)
+
+    footprint_gdf.to_file(args.footprint_results_path, driver='GPKG', layer='footprints')
+    aggregate_footprints(footprint_gdf, args.company_results_path, aggregate_by)
+
+
+if __name__ == '__main__':
+    main()
 

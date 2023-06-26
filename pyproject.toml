@@ -16,7 +16,7 @@ dependencies = [
 version = "0.1.0"
 
 [project.scripts]
-natural-capital-footprint-impact = "impact.cli:main"
+natural-capital-footprint-impact = "impact.src:main"
 
 [build-system]
 requires = ["setuptools"]
