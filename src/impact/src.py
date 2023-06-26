@@ -8,7 +8,7 @@ import tempfile
 import geopandas as gpd
 import logging
 import numpy
-from osgeo import ogr, gdal
+from osgeo import gdal, ogr, osr
 import pandas as pd
 import pygeoprocessing
 import rasterio
@@ -334,18 +334,31 @@ def main():
                              'to parallelize.')
     args = parser.parse_args()
 
+    asset_vector_srs = osr.SpatialReference()
+    asset_vector_srs.ImportFromWkt(
+        pygeoprocessing.get_vector_info(args.asset_vector)['projection_wkt'])
+
     # Make sure that all the ES layer paths are valid
     df = pd.read_csv(args.ecosystem_service_table)
     for _, row in pd.read_csv(args.ecosystem_service_table).iterrows():
         path = os.path.abspath(os.path.join(
                 os.path.dirname(args.ecosystem_service_table),
                 row['es_value_path']))
-        assert os.path.exists(path)
+        if not os.path.exists(path):
+            raise ValueError(
+                f'The path {path} found in the ecosystem service table does not exist')
+
+        es_layer_srs = osr.SpatialReference()
+        es_layer_srs.ImportFromWkt(
+            pygeoprocessing.get_raster_info(path)['projection_wkt'])
+        if not es_layer_srs.IsSame(asset_vector_srs):
+            raise ValueError(
+                f'The asset vector ({args.asset_vector}) is in a different projection '
+                f'than the ecosystem service layer {path}. All spatial inputs must have '
+                'the same projection.')
 
     if args.buffer_table and args.mode == 'polygons':
         raise ValueError('Cannot use a buffer table in polygon mode')
-
-    graph = taskgraph.TaskGraph(os.path.dirname(__file__), n_workers=8)
 
     if args.mode == 'points':
         if args.buffer_table:
@@ -354,13 +367,15 @@ def main():
                 tmp_footprint_path = os.path.join(tmpdir, 'footprints.gpkg')
                 footprint_gdf.to_file(tmp_footprint_path, driver='GPKG', layer='footprints')
 
-                footprint_gdf = footprint_stats(tmp_footprint_path, args.ecosystem_service_table)
+                footprint_gdf = footprint_stats(
+                    tmp_footprint_path, args.ecosystem_service_table, n_workers=args.n_workers)
         else:
             point_gdf = point_stats(args.asset_vector, args.ecosystem_service_table)
             point_gdf.to_file(results_path)
             aggregate_points(point_gdf)
     else:
-        footprint_gdf = footprint_stats(args.asset_vector, args.ecosystem_service_table)
+        footprint_gdf = footprint_stats(
+            args.asset_vector, args.ecosystem_service_table, n_workers=args.n_workers)
 
     footprint_gdf.to_file(args.footprint_results_path, driver='GPKG', layer='footprints')
     aggregate_footprints(footprint_gdf, args.company_results_path, aggregate_by)
