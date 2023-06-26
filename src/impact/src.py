@@ -146,16 +146,18 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id', n_workers=-1)
             (footprint_gdf.geom_type == 'MultiPolygon')).all():
         raise ValueError('All geometries in the asset vector must be polygons or multipolygons')
 
-    stats = ['max', 'sum', 'count', 'nodata_count']
+    es_df = pd.read_csv(es_table_path)
     es_id_to_task = {}
-    for _, row in pd.read_csv(es_table_path).iterrows():
+    for i, row in es_df.iterrows():
         es_id = row[id_col]
+        path = os.path.abspath(os.path.join(
+            os.path.dirname(es_table_path), row['es_value_path']))
+        pixel_size = pygeoprocessing.get_raster_info(path)['pixel_size']
+        es_df.loc[i, 'pixel_area'] = abs(pixel_size[0] * pixel_size[1])
 
         es_id_to_task[es_id] = graph.add_task(
             func=pygeoprocessing.zonal_statistics,
-            args=(
-                (os.path.abspath(os.path.join(os.path.dirname(es_table_path), row['es_value_path'])), 1),
-                footprint_path),
+            args=((path, 1), footprint_path),
             target_path_list=[],
             task_name=f'{es_id} stats',
             store_result=True)
@@ -163,21 +165,26 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id', n_workers=-1)
     graph.close()
     graph.join()
 
-    for _, row in pd.read_csv(es_table_path).iterrows():
+    for _, row in es_df.iterrows():
         es_id = row[id_col]
-
         zonal_stats = es_id_to_task[es_id].get()
-
-        for stat in stats:
+        for stat in ['max', 'sum', 'count', 'nodata_count']:
             footprint_gdf[f'{es_id}_{stat}'] = pd.Series(
                 footprint_gdf.index.to_series().map(
                     lambda fid: zonal_stats[fid][stat]))
 
+        # use the sum to calculate the mean, but leave it out of the final result
         footprint_gdf.loc[footprint_gdf[f'{es_id}_count'] > 0, f'{es_id}_mean'] = (
             footprint_gdf[f'{es_id}_sum'] / footprint_gdf[f'{es_id}_count'])
+        footprint_gdf = footprint_gdf.drop(f'{es_id}_sum', axis=1)
 
+        # flag assets that have an ES value greater than the threshold
         footprint_gdf[f'{es_id}_flag'] = (
             footprint_gdf[f'{es_id}_max'] > row['flag_threshold'])
+
+        # calculate the area-adjusted sum, which should be interpreted as an index
+        footprint_gdf[f'{es_id}_adj_sum'] = (
+            footprint_gdf[f'{es_id}_mean'] * footprint_gdf.area / row['pixel_area'])
 
     return footprint_gdf
 
