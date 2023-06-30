@@ -106,11 +106,11 @@ To do this in QGIS, use the *Add Delimited Text Layer* tool to add the CSV data 
 
 In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point* tool. This will create a point shapefile that you can use instead of a GeoPackage. 
 
-2. If your asset data is in a geographic (non-projected) coordinate system (where distances are given in degrees), reproject it to a projected coordinate system (where distances are in meters), such as Eckert IV:
+2. Reproject your your asset data to match the projection of your ecosystem service layers. If using the provided ecosystem service layers, reproject to Eckert IV:
 ```
 ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 ```
-This can also be done in QGIS with the Warp tool, and ArcGIS using the Project tool. Other projected coordinate systems may be used, such as UTM, as long as they are supported by GDAL (??? Emily, is this correct ???)
+This can also be done in QGIS with the Warp tool, and ArcGIS using the Project tool.
 
 3. Run the workflow:
 ```
@@ -140,19 +140,21 @@ options:
                         buffer asset points according to values in this table 
 ```
 
+These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may replace
+
 
 ### Point mode
-`natural-capital-footprint-impact -e <ecosystem service table path> points <asset point vector path> <output vector path> <output table path>`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv points assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
 In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 
 ### Buffer mode
-`natural-capital-footprint-impact -e <ecosystem service table path> points --buffer-table <buffer table path> <asset point vector path> <output vector path> <output table path>`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv points --buffer-table buffer_table.csv assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
 In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Ecosystem service statistics are calculated under each footprint.
 
 ### Polygon mode
-`natural-capital-footprint-impact -e <ecosystem service table path> polygons <asset polygon vector path> <output vector path> <output table path>`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv polygons assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
 In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Ecosystem service statistics are calculated under each footprint.
 
@@ -161,7 +163,7 @@ In **Polygon mode**, you provide the assets as footprint polygons. This mode is 
 {??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
 
 ### Footprint statistics vector
-The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<service>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
+The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
 
 - `max`: maximum service value within the asset footprint
 - `mean`: mean service value within the asset footprint
@@ -174,26 +176,29 @@ If the ecosystem service table has been modified with a different number of serv
 
 ### Company statistics table
 The output company table contains 
-{??? Again, is "es_id" is used for "service" below? If so, make this explicit here, note in the ecosystem service table section, and make consistent throughout the doc. ???}
 
-- `<service>_sum`: Sum of each ecosystem service under asset footprints for each service
-- `<service>_mean`: Mean of each ecosystem service under asset footprints
-- `<service>_assets`: For each service, the number of assets with data
-- `<service>_area`: Total area of asset footprints per company that are overlapping data for each service
-- `<service>_flags`: For each service, the number of assets flagged
-- `percent_<service>_flagged`:  For each service, the percent of assets flagged
+- `<es_id>_adj_sum`: Sum of `<es_id>_adj_sum` under asset footprints for each service
+- `<es_id>_mean`: Mean of each ecosystem service under asset footprints
+- `<es_id>_assets`: For each service, the number of assets with data
+- `<es_id>_area`: Total area of asset footprints per company that are overlapping data for each service
+- `<es_id>_flagged`: For each service, the number of assets flagged
+- `percent_<es_id>_flagged`:  For each service, the percent of assets flagged
 - `total_assets`: Total number of assets belonging to each company
 - `total_area`: Total area of asset footprints belonging to each company
-- `total_flags`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
+- `total_flagged`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
 - `percent_total_flagged`: Percent of assets flagged in any category 
-
-
 
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
 ### polygon vector
 **Buffer mode** and **Polygon mode** both produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
+
+### Exporting to CSV
+If you prefer to work with the asset-level results in CSV format, you can convert the GPKG to CSV like so:
+```
+ogr2ogr -f CSV asset_results.csv asset_results.gpkg
+```
 
 
 ## References
