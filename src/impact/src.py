@@ -77,8 +77,6 @@ def buffer_points(point_vector_path, buffer_csv_path, attr, area_col='footprint_
 def point_stats(point_path, es_table_path, id_col='es_id'):
     """Find and record ecosystem service values under points.
 
-
-
     Args:
         point_gdf (gpd.GeoDataframe):
         out_path (str):
@@ -106,15 +104,19 @@ def point_stats(point_path, es_table_path, id_col='es_id'):
     for _, row in pd.read_csv(es_table_path).iterrows():
         es_id = row[id_col]
         # evaluate path relative to the ES table location
-        es_dataset = rasterio.open(
-            os.path.abspath(os.path.join(
-                os.path.dirname(es_table_path), row['es_value_path'])))
+        es_path = os.path.abspath(os.path.join(
+                os.path.dirname(es_table_path), row['es_value_path']))
+        es_dataset = rasterio.open(es_path)
+
+        nodata = pygeoprocessing.get_raster_info(es_path)['nodata'][0]
 
         # get the pixel value under each point
-        point_values = numpy.ma.MaskedArray(
-            list(es_dataset.sample(coord_list, masked=True)))
-        point_values[point_values is masked] = numpy.nan
+        point_values = numpy.array(
+            list(es_dataset.sample(coord_list)), dtype=numpy.float32
+        ).flatten()
 
+        if nodata is not None:
+            point_values[numpy.isclose(point_values, nodata, equal_nan=True)] = numpy.nan
         point_gdf[es_id] = point_values
         point_gdf[f'{es_id}_flag'] = point_values > row['flag_threshold']
 
@@ -189,164 +191,94 @@ def footprint_stats(footprint_path, es_table_path, id_col='es_id', n_workers=-1)
     return footprint_gdf
 
 
-def aggregate_footprints(gdf, out_path, aggregate_by):
+def aggregate_footprints(gdf, out_path, aggregate_by, mode):
     """Aggregate footprint stats up to the company level.
 
     Args:
         footprint_path (str): path to a GDAL-supported footprint polygon vector
         out_path (str): path to write out the CSV table of aggregated data
         aggregate_by (str): footprint attribute to aggregate by
+        mode (str): 'points' or 'polygons'
 
     Returns:
         None
     """
     logger.info('aggregating...')
-    es_ids = [x[:-4] for x in gdf.columns if x.endswith('sum')]
+    es_ids = [x[:-5] for x in gdf.columns if x.endswith('_flag')]
     results = {}
     vals = gdf[aggregate_by].unique()
 
     for company in vals:
-        company_rows = gdf[gdf[aggregate_by] == company]
-        results[company] = {}
-        total_flags = pd.Series([False for _ in range(company_rows.shape[0])])
-        for es_id in es_ids:
-
-            # company assets that overlap this ecosystem service
-            valid_company_rows = (
-                company_rows[company_rows[f'{es_id}_count'] > 0])
-
-            # sum of ES pixel values under all asset footprints per company
-            results[company][f'{es_id}_sum'] = (
-                valid_company_rows[f'{es_id}_sum'].sum())
-
-            # mean of ES pixel values under all asset footprints per company
-            n_valid_es_pixels = valid_company_rows[f'{es_id}_count'].sum()
-            if n_valid_es_pixels == 0:
-                results[company][f'{es_id}_mean'] = None
-            else:
-                # sum of es pixel values / the number of es pixel values
-                results[company][f'{es_id}_mean'] = (
-                    valid_company_rows[f'{es_id}_sum'].sum() /
-                    n_valid_es_pixels)
-
-            # total area of asset footprints per company that are overlapping data
-            results[company][f'{es_id}_area'] = (
-                valid_company_rows['geometry'].area.sum())
-            # total number of assets per company that are overlapping data
-            results[company][f'{es_id}_assets'] = valid_company_rows.shape[0]
-
-            results[company][f'{es_id}_flags'] = valid_company_rows[f'{es_id}_flag'].sum()
-
-            results[company][f'percent_{es_id}_flagged'] = (
-                results[company][f'{es_id}_flags'] /
-                results[company][f'{es_id}_assets'] * 100)
-
-            total_flags = total_flags | company_rows[f'{es_id}_flag']
-
-
-        # total area of asset footprints per company (overlapping data or not)
-        results[company]['total_area'] = company_rows['geometry'].area.sum()
-        # total number of assets per company (whether overlapping data or not)
-        results[company]['total_assets'] = company_rows.shape[0]
-
-        results[company]['total_flags'] = total_flags.sum()
-
-        results[company]['percent_total_flagged'] = (
-            results[company]['total_flags'] / results[company]['total_assets'] * 100)
-
-    df = pd.DataFrame(results).T
-    df.to_csv(out_path)
-
-
-def aggregate_points(footprint_path, out_path, aggregate_by):
-    """Aggregate footprint stats up to the company level.
-
-    Args:
-        footprint_path (str): path to a GDAL-supported footprint polygon vector
-        out_path (str): path to write out the CSV table of aggregated data
-        aggregate_by (str): footprint attribute to aggregate by
-
-    Returns:
-        None
-    """
-    logger.info('aggregating...')
-    gdf = gpd.read_file(footprint_path)
-    es_ids = [x[:-4] for x in gdf.columns if x.endswith('sum')]
-    results = {}
-    vals = gdf[aggregate_by].unique()
-    for company in vals:
-        company_rows = gdf[gdf[aggregate_by] == company]
+        company_rows = gdf[gdf[aggregate_by] == company].copy()
+        company_rows['any_flag'] = [False for _ in range(company_rows.shape[0])]
         results[company] = {}
         for es_id in es_ids:
 
-            # company assets that overlap this ecosystem service
-            valid_company_rows = (
-                company_rows[company_rows[f'{es_id}_count'] > 0])
+            if mode == 'polygons':
+                # company assets that overlap this ecosystem service
+                valid_company_rows = (
+                    company_rows[company_rows[f'{es_id}_count'] > 0])
 
-            # sum of ES pixel values under all asset footprints per company
-            results[company][f'{es_id}_sum'] = (
-                valid_company_rows[f'{es_id}_sum'].sum())
+                # sum of ES pixel values under all asset footprints per company
+                results[company][f'{es_id}_adj_sum'] = (
+                    valid_company_rows[f'{es_id}_adj_sum'].sum())
 
-            # mean of ES pixel values under all asset footprints per company
-            n_valid_es_pixels = valid_company_rows[f'{es_id}_count'].sum()
-            if n_valid_es_pixels == 0:
-                results[company][f'{es_id}_mean'] = None
-            else:
-                # sum of es pixel values / the number of es pixel values
-                results[company][f'{es_id}_mean'] = (
-                    valid_company_rows[f'{es_id}_sum'].sum() /
-                    n_valid_es_pixels)
+                # total area of asset footprints per company that are overlapping data
+                results[company][f'{es_id}_area'] = (
+                    valid_company_rows['geometry'].area.sum())
+            else:  # point mode
+                # company assets that overlap this ecosystem service
+                valid_company_rows = company_rows[company_rows[f'{es_id}'].notnull()]
 
-            # total area of asset footprints per company that are overlapping data
-            results[company][f'{es_id}_area'] = (
-                valid_company_rows['geometry'].area.sum())
+                # sum of ES pixel values under all asset points per company
+                results[company][f'{es_id}_sum'] = valid_company_rows[f'{es_id}'].sum()
+
             # total number of assets per company that are overlapping data
             results[company][f'{es_id}_assets'] = valid_company_rows.shape[0]
 
-        # total area of asset footprints per company (overlapping data or not)
-        results[company]['total_area'] = company_rows['geometry'].area.sum()
+            results[company][f'{es_id}_flagged'] = valid_company_rows[f'{es_id}_flag'].sum()
+
+            if results[company][f'{es_id}_assets'] == 0:
+                results[company][f'percent_{es_id}_flagged'] = 0
+            else:
+                results[company][f'percent_{es_id}_flagged'] = (
+                    results[company][f'{es_id}_flagged'] /
+                    results[company][f'{es_id}_assets'] * 100)
+
+            company_rows['any_flag'] = company_rows['any_flag'] | company_rows[f'{es_id}_flag']
+
+        if mode == 'polygons':
+            # total area of asset footprints per company (overlapping data or not)
+            results[company]['total_area'] = company_rows['geometry'].area.sum()
         # total number of assets per company (whether overlapping data or not)
         results[company]['total_assets'] = company_rows.shape[0]
 
+        results[company]['total_flagged'] = company_rows['any_flag'].sum()
+
+        if results[company]['total_assets'] == 0:
+            results[company]['percent_total_flagged'] = 0
+        else:
+            results[company]['percent_total_flagged'] = (
+                results[company]['total_flagged'] /
+                results[company]['total_assets'] * 100)
+
     df = pd.DataFrame(results).T
-    for es_id in es_ids:
-        for col in [f'{es_id}_assets', 'total_assets']:
+    for es_id in es_ids + ['total']:
+        for col in [f'{es_id}_assets', f'{es_id}_flagged']:
             df[col] = df[col].astype(int)
-    df.to_csv(out_path, float_format='%.5f')
-
-aggregate_by = 'ultimate_parent_name'
-attr = 'facility_category'
+    df.to_csv(out_path, index_label=aggregate_by)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--ecosystem-service-table', required=True,
-                        help='path to the ecosystem service table')
-    parser.add_argument('mode', choices=['points', 'polygons'],
-                        help=(
-                            'mode of operation. in points mode, the asset vector '
-                            'contains point geometries. in polygons mode, it contains '
-                            'polygon geometries.'))
-    parser.add_argument('-b', '--buffer-table',
-                        help='buffer points according to values in this table')
-    parser.add_argument('asset_vector',
-                        help='path to the asset vector')
-    parser.add_argument('footprint_results_path',
-                        help='path to write out the asset results vector')
-    parser.add_argument('company_results_path',
-                        help='path to write out the aggregated results table')
-    parser.add_argument('-n', '--n-workers', default=-1,
-                        help='number of parallel subprocess workers to use. '
-                             '0 = no subprocesses.  Set >0 '
-                             'to parallelize.')
-    args = parser.parse_args()
+def execute(args):
 
+    aggregate_by = 'company'
+    attr = 'category'
+
+    # Make sure that all the ES layer paths are valid,
+    # and that all inputs are in the same projection
     asset_vector_srs = osr.SpatialReference()
     asset_vector_srs.ImportFromWkt(
         pygeoprocessing.get_vector_info(args.asset_vector)['projection_wkt'])
-
-    # Make sure that all the ES layer paths are valid
-    df = pd.read_csv(args.ecosystem_service_table)
     for _, row in pd.read_csv(args.ecosystem_service_table).iterrows():
         path = os.path.abspath(os.path.join(
                 os.path.dirname(args.ecosystem_service_table),
@@ -373,21 +305,45 @@ def main():
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmp_footprint_path = os.path.join(tmpdir, 'footprints.gpkg')
                 footprint_gdf.to_file(tmp_footprint_path, driver='GPKG', layer='footprints')
-
                 footprint_gdf = footprint_stats(
                     tmp_footprint_path, args.ecosystem_service_table, n_workers=args.n_workers)
+                footprint_gdf.to_file(args.footprint_results_path, driver='GPKG', layer='footprints')
+                aggregate_footprints(footprint_gdf, args.company_results_path, aggregate_by, 'polygons')
         else:
             point_gdf = point_stats(args.asset_vector, args.ecosystem_service_table)
-            point_gdf.to_file(results_path)
-            aggregate_points(point_gdf)
+            point_gdf.to_file(args.footprint_results_path)
+            aggregate_footprints(point_gdf, args.company_results_path, aggregate_by, 'points')
     else:
         footprint_gdf = footprint_stats(
             args.asset_vector, args.ecosystem_service_table, n_workers=args.n_workers)
+        footprint_gdf.to_file(args.footprint_results_path, driver='GPKG', layer='footprints')
+        aggregate_footprints(footprint_gdf, args.company_results_path, aggregate_by, 'polygons')
 
-    footprint_gdf.to_file(args.footprint_results_path, driver='GPKG', layer='footprints')
-    aggregate_footprints(footprint_gdf, args.company_results_path, aggregate_by)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--ecosystem-service-table', required=True,
+                        help='path to the ecosystem service table')
+    parser.add_argument('mode', choices=['points', 'polygons'],
+                        help=(
+                            'mode of operation. in points mode, the asset vector '
+                            'contains point geometries. in polygons mode, it contains '
+                            'polygon geometries.'))
+    parser.add_argument('-b', '--buffer-table',
+                        help='buffer points according to values in this table')
+    parser.add_argument('asset_vector',
+                        help='path to the asset vector')
+    parser.add_argument('footprint_results_path',
+                        help='path to write out the asset results vector')
+    parser.add_argument('company_results_path',
+                        help='path to write out the aggregated results table')
+    parser.add_argument('-n', '--n-workers', default=-1,
+                        help='number of parallel subprocess workers to use. '
+                             '0 = no subprocesses.  Set >0 '
+                             'to parallelize.')
+    args = parser.parse_args()
+    execute(args)
 
 
 if __name__ == '__main__':
     main()
-
