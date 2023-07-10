@@ -172,19 +172,40 @@ If this causes problems, you may try resampling the ecosystem service layers to 
 
 ## Output formats
 
-{??? Add an example output table for both footprint statistics and company statistics ???}
-
 ### Footprint statistics vector
-The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
+The output vector attribute table is based on the point or polygon asset vector provided as input. Several statistics are calculated for each ecosystem service:
 
+**In point mode:**
+- `<es_id>`: maximum service value within the asset footprint
+- `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
+
+Using the provided service list, 10 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
+
+Example attribute table:
+| FID | kba     | kba_flag | ... |
+|-----|---------|----------|-----|
+| 1   | 1       | 1        | ... |
+| 2   | 0       | 0        | ... |
+
+**In point buffer mode and polygon mode:**
 - `<es_id>_max`: maximum service value within the asset footprint
 - `<es_id>_mean`: mean service value within the asset footprint
 - `<es_id>_adj_sum`: Area-adjusted sum of service values on each pixel within the asset footprint
 - `<es_id>_count`: number of pixels within the asset footprint that have data for the service
 - `<es_id>_nodata_count`: number of pixels within the asset footprint that are missing data for the service
-- `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
+- `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
 
-The units for the `max`, `mean` and `sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the 6 statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
+Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics.
+
+Example attribute table:
+| FID | kba_max | kba_mean | kba_adj_sum | ... |
+|-----|---------|----------|-------------|-----|
+| 1   | 1       | 0.25     | 0.3         | ... |
+| 2   | 0       | 0        | 0           | ... |
+
+The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean` and `<es_id>_adj_sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
+
+
 
 ### Company statistics table
 The output company table contains 
