@@ -31,9 +31,8 @@ Required for both **Point mode** and **Buffer mode**. Point data must be provide
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
-1. Coordinate locations of each asset are in the `latitude` and `longitude` columns. These fields are required when using both **Point mode** and **Buffer mode**.
-2. The `category` column determines footprint size. This field is required when using **Buffer mode** only.
-3. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
+1. The `category` column determines footprint size. This field is required when using **Buffer mode** only.
+2. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
 
 Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {??? Add more information about what aggregation means and how it works. ???}
 
