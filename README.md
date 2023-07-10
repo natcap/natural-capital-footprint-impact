@@ -189,11 +189,13 @@ Example attribute table:
 
 **In point buffer mode and polygon mode:**
 - `<es_id>_max`: maximum service value within the asset footprint
-- `<es_id>_mean`: mean service value within the asset footprint
-- `<es_id>_adj_sum`: Area-adjusted sum of service values on each pixel within the asset footprint
+- `<es_id>_mean`: mean service value within the asset footprint.
+- `<es_id>_adj_sum`: Area-adjusted sum of service values on each pixel within the asset footprint. This is `<es_id>_mean` multiplied by the asset footprint area.
 - `<es_id>_count`: number of pixels within the asset footprint that have data for the service
 - `<es_id>_nodata_count`: number of pixels within the asset footprint that are missing data for the service
 - `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
+
+Note: These statistics are derived from the set of pixels that is calculated as described above, see "Caveats about footprint statistics".
 
 Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics.
 
@@ -210,7 +212,7 @@ The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean` and `<es_id>_adj_sum`
 ### Company statistics table
 The output company table contains 
 
-- `<es_id>_adj_sum`: Sum of `<es_id>_adj_sum` under asset footprints for each service {??? What is `<es_id>_adj_sum` ???}
+- `<es_id>_adj_sum`: Sum of `<es_id>_adj_sum` under asset footprints for each service
 - `<es_id>_mean`: Mean of each ecosystem service under asset footprints
 - `<es_id>_assets`: For each service, the number of assets with data
 - `<es_id>_area`: Total area of asset footprints per company that are overlapping data for each service
