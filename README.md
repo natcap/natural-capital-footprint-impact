@@ -49,8 +49,6 @@ Footprint sizes vary widely, but correlate with the type of asset (for example, 
 
 Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
 
-If you are running the script in **Polygon mode**, no additional fields are required by the script. {??? Is this true ???}
-
 ## Data provided for you
 
 ### footprint data by asset category
