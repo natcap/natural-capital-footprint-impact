@@ -160,7 +160,7 @@ In **Polygon mode**, you provide the assets as footprint polygons. This mode is 
 
 ## Output formats
 
-{??? Add details about the output fields - names, units, description, etc. An example for each would be good too. ???}
+{??? Add an example output table for both footprint statistics and company statistics ???}
 
 ### Footprint statistics vector
 The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
@@ -172,12 +172,12 @@ The output vector attribute table is based on the point or polygon asset vector 
 - `nodata_count`: number of pixels within the asset footprint that are missing data for the service
 - `flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
 
-If the ecosystem service table has been modified with a different number of services, then the 6 statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
+The units for the `max`, `mean` and `sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the 6 statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
 
 ### Company statistics table
 The output company table contains 
 
-- `<es_id>_adj_sum`: Sum of `<es_id>_adj_sum` under asset footprints for each service
+- `<es_id>_adj_sum`: Sum of `<es_id>_adj_sum` under asset footprints for each service {??? What is `<es_id>_adj_sum` ???}
 - `<es_id>_mean`: Mean of each ecosystem service under asset footprints
 - `<es_id>_assets`: For each service, the number of assets with data
 - `<es_id>_area`: Total area of asset footprints per company that are overlapping data for each service
@@ -186,7 +186,9 @@ The output company table contains
 - `total_assets`: Total number of assets belonging to each company
 - `total_area`: Total area of asset footprints belonging to each company
 - `total_flagged`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
-- `percent_total_flagged`: Percent of assets flagged in any category 
+- `percent_total_flagged`: Percent of assets flagged in any category
+
+Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units.
 
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
