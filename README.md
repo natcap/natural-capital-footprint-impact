@@ -140,7 +140,7 @@ options:
                         buffer asset points according to values in this table 
 ```
 
-These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may replace
+These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may replace {??? missing end of sentence ???}
 
 
 ### Point mode
