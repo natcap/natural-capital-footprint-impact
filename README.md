@@ -34,15 +34,7 @@ The asset vector layer contains an attribute table, where each row represents an
 1. The `category` column determines footprint size. This field is required when using **Buffer mode** only.
 2. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
 
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data. {??? Add more information about what aggregation means and how it works. ???}
-
-| latitude | longitude | category          | company       |
-|----------|-----------|-------------------|---------------|
-| 81.07    | 33.55     | Bank Branch       | XYZ Corp      |
-| ...      | ...       | ...               | ...           |
-
-*Table 1. Asset vector attribute table field requirements and example values for Point mode and Buffer mode.*
-
+Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
 #### Polygon asset vector
 
@@ -67,8 +59,8 @@ The provided footprint areas were derived by manually estimating the footprint a
 ### ecosystem service data
 Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
-- `es_id`: A unique text (string) identifier for the ecosystem service {??? Emily, are there any requirements for this? Is it used in the output? Coordinate this language with the footprint statistics vector explanation below. ???}
-- `es_value_path`: File path to a geospatial raster map of the ecosystem service {??? File type requirements ???}
+- `es_id`: A unique identifier for the ecosystem service. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
+- `es_value_path`: File path to a GDAL-supported geospatial raster map of the ecosystem service
 - `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
 
 | es_id    | es_value_path         | flag_threshold         |
