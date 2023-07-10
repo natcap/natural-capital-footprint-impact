@@ -69,7 +69,7 @@ Services are defined in a CSV (comma-separated value) table, where each row repr
 Columns are:
 - `es_id`: A unique text (string) identifier for the ecosystem service {??? Emily, are there any requirements for this? Is it used in the output? Coordinate this language with the footprint statistics vector explanation below. ???}
 - `es_value_path`: File path to a geospatial raster map of the ecosystem service {??? File type requirements ???}
-- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. {??? is this a number? how is it determined? Need to explain flags in more detail. ???}
+- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
 
 | es_id    | es_value_path         | flag_threshold         |
 |----------|-----------------------|------------------------|
@@ -163,12 +163,12 @@ In **Polygon mode**, you provide the assets as footprint polygons. This mode is 
 ### Footprint statistics vector
 The output vector attribute table is based on the point or polygon asset vector provided as input. Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics: 
 
-- `max`: maximum service value within the asset footprint
-- `mean`: mean service value within the asset footprint
-- `sum`: sum of service values on each pixel within the asset footprint
-- `count`: number of pixels within the asset footprint that have data for the service
-- `nodata_count`: number of pixels within the asset footprint that are missing data for the service
-- `flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
+- `<es_id>_max`: maximum service value within the asset footprint
+- `<es_id>_mean`: mean service value within the asset footprint
+- `<es_id>_adj_sum`: Area-adjusted sum of service values on each pixel within the asset footprint
+- `<es_id>_count`: number of pixels within the asset footprint that have data for the service
+- `<es_id>_nodata_count`: number of pixels within the asset footprint that are missing data for the service
+- `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `max` value is greater than the `flag_threshold` value in the ecosystem service table.
 
 The units for the `max`, `mean` and `sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the 6 statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
 
@@ -188,6 +188,12 @@ The output company table contains
 
 Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units.
 
+Example:
+| company  | kba_adj_sum | kba_mean | kba_assets | ... |
+|----------|-------------|----------|------------|-----|
+| XYZ Corp | 0           | 0        | 3          | ... |
+| AAA Inc. | 0.57        | 0.7      | 13         | ... |
+
 ### CSV and point vector
 **Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
 
@@ -199,7 +205,6 @@ If you prefer to work with the asset-level results in CSV format, you can conver
 ```
 ogr2ogr -f CSV asset_results.csv asset_results.gpkg
 ```
-
 
 ## References
 
