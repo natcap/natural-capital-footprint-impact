@@ -31,10 +31,8 @@ Required for both **Point mode** and **Buffer mode**. Point data must be provide
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
-1. The `category` column determines footprint size. This field is required when using **Buffer mode** only.
+1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations.
 2. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
-
-Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations. Other attributes, like the name of the ultimate parent company, may be used to aggregate data.
 
 #### Polygon asset vector
 
@@ -109,8 +107,6 @@ natural-capital-footprint-impact -e ECOSYSTEM_SERVICE_TABLE {points,polygons} [-
 
 ## Modes of operation
 
-{??? Add file naming requirements for footprint_results_path and company_results_path. Also provide an example for each mode. ???}
-
 ```
 usage: natural-capital-footprint-impact [-h] -e ECOSYSTEM_SERVICE_TABLE [-b BUFFER_TABLE]
                                         {points,polygons} asset_vector footprint_results_path company_results_path
@@ -130,8 +126,7 @@ options:
                         buffer asset points according to values in this table 
 ```
 
-These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may replace {??? missing end of sentence ???}
-
+These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may use any other valid file path instead.
 
 ### Point mode
 `natural-capital-footprint-impact -e ecosystem_service_table.csv points assets_eckert.gpkg asset_results.gpkg company_results.csv`
