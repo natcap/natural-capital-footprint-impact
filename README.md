@@ -192,11 +192,11 @@ Example attribute table:
 | 2   | 0       | 0        | ... |
 
 **In point buffer mode and polygon mode:**
-- `<es_id>_max`: maximum service value within the asset footprint
+- `<es_id>_max`: maximum service value within the asset footprint.
 - `<es_id>_mean`: mean service value within the asset footprint.
 - `<es_id>_adj_sum`: Area-adjusted sum of service values on each pixel within the asset footprint. This is `<es_id>_mean` multiplied by the asset footprint area.
-- `<es_id>_count`: number of pixels within the asset footprint that have data for the service
-- `<es_id>_nodata_count`: number of pixels within the asset footprint that are missing data for the service
+- `<es_id>_count`: number of pixels within the asset footprint that have data for the service.
+- `<es_id>_nodata_count`: number of pixels within the asset footprint that are missing data for the service.
 - `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
 
 Note: These statistics are derived from the set of pixels that is calculated as described above, see "Caveats about footprint statistics".
