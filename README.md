@@ -63,7 +63,7 @@ Columns are:
 
 | es_id    | es_value_path         | flag_threshold         |
 |----------|-----------------------|------------------------|
-| sediment | gs://foo-sediment.tif | 123                    |
+| sediment | foo-sediment.tif      | 123                    |
 | ...      | ...                   | ...                    |
 
 *Table 3. Ecosystem service table: defines the ecosystem service layers that will be used by the script.*
@@ -133,15 +133,42 @@ These examples assume your ecosystem service table is named `ecosystem_service_t
 
 In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 
-### Buffer mode
+When run in point mode, the script performs these steps:
+1. Calculates ecosystem service values at the location of each asset point
+2. Groups asset points by their `company` attribute
+3. Aggregates statistics about the asset points for each `company`
+
+### Point buffer mode
 `natural-capital-footprint-impact -e ecosystem_service_table.csv points --buffer-table buffer_table.csv assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
 In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Ecosystem service statistics are calculated under each footprint.
+
+When run in point buffer mode, the script performs these steps:
+1. Cross-references the asset vector with the buffer table on the `category` attribute to get the buffer area for each asset.
+2. Buffers each asset point to form an asset footprint polygon with the appropriate buffer area. The buffer polygon is a many-sided regular polygon approximating a circle.
+3. Calculates statistics about each ecosystem service within the area of each asset footprint. See note below for caveats.
+4. Groups asset footprints by their `company` attribute
+5. Aggregates statistics about the assets for each `company`
 
 ### Polygon mode
 `natural-capital-footprint-impact -e ecosystem_service_table.csv polygons assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
 In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Ecosystem service statistics are calculated under each footprint.
+
+When run in polygon mode, the script performs these steps:
+1. Calculates statistics about each ecosystem service within the area of each asset footprint. See note below for caveats.
+2. Groups asset footprints by their `company` attribute
+3. Aggregates statistics about the assets for each `company`
+
+### Caveat about footprint statistics
+Because of the coarse resolution of the ecosystem service layers relative to typical asset footprint size, and the way that zonal statistics are calculated in the underlying library `pygeoprocessing`, some results at the asset level may be non-intuitive. `pygeoprocessing.zonal_statistics` calculates statistics using this algorithm:
+```
+If the polygon overlaps the centerpoint of at least one pixel:
+    Statistics are calculated from the set of pixel(s) whose centerpoints fall within the polygon
+If the polygon does not overlap the centerpoint of any pixel:
+    Statistics are calculated from the set of pixel(s) that intersect the bounding box of the polygon
+```
+If this causes problems, you may try resampling the ecosystem service layers to a finer resolution.
 
 ## Output formats
 
