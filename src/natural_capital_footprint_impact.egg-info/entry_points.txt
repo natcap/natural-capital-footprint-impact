@@ -1,0 +1,2 @@
+[console_scripts]
+natural-capital-footprint-impact = impact.src:main

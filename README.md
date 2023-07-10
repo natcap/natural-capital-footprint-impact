@@ -1,7 +1,7 @@
 # natural capital footprint impact
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-Company footprint impact workflow (eventually to be made public)
+Asset and company footprint impact workflow (eventually to be made public)
 
 This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
 
@@ -13,12 +13,12 @@ The ecosystem services provided are:
 - `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019).
 
 Some useful definitions:
-- **Asset**: A unit of physical infrastructure that occupies space on the surface of the earth, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
-- **Footprint**: The area on the earth surface taken up by an asset.
+- **Asset**: A unit of physical infrastructure that occupies land on Earth's surface, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
+- **Footprint**: The area on Earth's surface occupied by an asset.
 
-Asset location data is usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this script can be used in three different ways:
+Asset location data are usually available as point coordinates (latitude/longitude). The real footprint of an asset may be available, but usually is not. To account for differences in data availability, this script can be used in three different ways:
 1. **Point mode**: Assets are provided by the user as latitude/longitude points. The actual asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
-2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is modeled by creating a circular buffer with defined area around each point. Ecosystem service statistics are calculated under each buffer/footprint.
+2. **Buffer mode**: Assets are provided by the user as latitude/longitude points. The asset footprint is modeled around each point by creating a circular buffer of an area defined by the asset type. Ecosystem service statistics are calculated under each buffered footprint.
 3. **Polygon mode**: Assets are provided by the user as footprint polygons. This mode is preferred if actual asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
 
 ## Data you must provide
@@ -27,32 +27,36 @@ Asset location data is usually available as point coordinates (latitude/longitud
 
 #### Point asset vector
 
-Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the first layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that exist in the original vector attribute table will be preserved in the output.
+Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the same layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that exist in the original vector attribute table will be preserved in the output.
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
 1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations.
 2. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
 
+Field names must be spelled exactly as shown above, with no extra spaces or characters.
+
 #### Polygon asset vector
 
-Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the first layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
+Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the same layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
+
+The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics. The field name, `company`, must be spelled exactly as shown here, with no extra spaces or characters.
 
 ## Data provided for you
 
 ### footprint data by asset category
-Footprint data is defined in a CSV (comma-separated value) table, where each row represents an asset category.
+Footprint buffer area data are defined in a CSV (comma-separated value) table (Table 2), where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the *category* field in the asset table (Table 1).
-The second column is named `area`. This is the size (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
+The second column is named `area`. This is the area (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
 | category          | area           |
 |-------------------|----------------|
-| Bank Branch       | 549.7          |
+| Bank Branch       | 5073.7         |
 | ...               | ...            |
 
 *Table 2. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
 
-The provided footprint areas were derived by manually estimating the footprint area of real assets on satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but it must be in CSV format, and include the required `category` and `area` fields.
+The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
 ### ecosystem service data
 Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
@@ -68,7 +72,7 @@ Columns are:
 
 *Table 3. Ecosystem service table: defines the ecosystem service layers that will be used by the script.*
 
-You may modify or replace this table if you wish to use different ecosystem service data, but it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold` fields.
+You may modify or replace this table if you wish to use different ecosystem service data, but they must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields.
 
 ## Installation
 
@@ -86,7 +90,7 @@ You may modify or replace this table if you wish to use different ecosystem serv
    ```
 
 ## Workflow
-1. If your asset point data is in CSV format, convert it to a GDAL-supported vector format such as GeoPackage (GPKG):
+1. If your asset point data are in CSV format, convert it to a GDAL-supported vector format such as GeoPackage (GPKG):
 ```
 ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:4326 -oo X_POSSIBLE_NAMES=longitude -oo Y_POSSIBLE_NAMES=latitude assets.gpkg assets.csv
 ```
@@ -94,7 +98,7 @@ To do this in QGIS, use the *Add Delimited Text Layer* tool to add the CSV data 
 
 In ArcGIS Pro, import the CSV data to a point layer using the *XY Data to Point* tool. This will create a point shapefile that you can use instead of a GeoPackage. 
 
-2. Reproject your your asset data to match the projection of your ecosystem service layers. If using the provided ecosystem service layers, reproject to Eckert IV:
+2. Reproject your asset data to match the projection of your ecosystem service layers. If using the provided ecosystem service layers, assets must be projected in Eckert IV (ESRI:54012):
 ```
 ogr2ogr -t_srs ESRI:54012 assets_eckert.gpkg assets.gpkg
 ```
@@ -134,9 +138,9 @@ These examples assume your ecosystem service table is named `ecosystem_service_t
 In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 
 When run in point mode, the script performs these steps:
-1. Calculates ecosystem service values at the location of each asset point
-2. Groups asset points by their `company` attribute
-3. Aggregates statistics about the asset points for each `company`
+1. Calculates ecosystem service values at the location of each asset point.
+2. Groups asset points by their `company` attribute.
+3. Aggregates statistics about the asset points for each `company`.
 
 ### Point buffer mode
 `natural-capital-footprint-impact -e ecosystem_service_table.csv points --buffer-table buffer_table.csv assets_eckert.gpkg asset_results.gpkg company_results.csv`
@@ -147,24 +151,24 @@ When run in point buffer mode, the script performs these steps:
 1. Cross-references the asset vector with the buffer table on the `category` attribute to get the buffer area for each asset.
 2. Buffers each asset point to form an asset footprint polygon with the appropriate buffer area. The buffer polygon is a many-sided regular polygon approximating a circle.
 3. Calculates statistics about each ecosystem service within the area of each asset footprint. See note below for caveats.
-4. Groups asset footprints by their `company` attribute
-5. Aggregates statistics about the assets for each `company`
+4. Groups asset footprints by their `company` attribute.
+5. Aggregates statistics about the assets for each `company`.
 
 ### Polygon mode
 `natural-capital-footprint-impact -e ecosystem_service_table.csv polygons assets_eckert.gpkg asset_results.gpkg company_results.csv`
 
-In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data is available. Ecosystem service statistics are calculated under each footprint.
+In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
 
 When run in polygon mode, the script performs these steps:
 1. Calculates statistics about each ecosystem service within the area of each asset footprint. See note below for caveats.
-2. Groups asset footprints by their `company` attribute
-3. Aggregates statistics about the assets for each `company`
+2. Groups asset footprints by their `company` attribute.
+3. Aggregates statistics about the assets for each `company`.
 
 ### Caveat about footprint statistics
-Because of the coarse resolution of the ecosystem service layers relative to typical asset footprint size, and the way that zonal statistics are calculated in the underlying library `pygeoprocessing`, some results at the asset level may be non-intuitive. `pygeoprocessing.zonal_statistics` calculates statistics using this algorithm:
+Because of the coarse resolution of the ecosystem service layers relative to typical asset footprint sizes, and the way that zonal statistics are calculated in the underlying library `pygeoprocessing`, some results at the asset level may be non-intuitive. `pygeoprocessing.zonal_statistics` calculates statistics using this algorithm:
 ```
 If the polygon overlaps the centerpoint of at least one pixel:
-    Statistics are calculated from the set of pixel(s) whose centerpoints fall within the polygon
+    Statistics are only calculated from the set of pixel(s) whose centerpoints fall within the polygon
 If the polygon does not overlap the centerpoint of any pixel:
     Statistics are calculated from the set of pixel(s) that intersect the bounding box of the polygon
 ```
@@ -205,7 +209,7 @@ Example attribute table:
 | 1   | 1       | 0.25     | 0.3         | ... |
 | 2   | 0       | 0        | 0           | ... |
 
-The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean` and `<es_id>_adj_sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
+The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean`, and `<es_id>_adj_sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
 
 
 
@@ -217,10 +221,10 @@ The output company table contains
 - `<es_id>_assets`: For each service, the number of assets with data
 - `<es_id>_area`: Total area of asset footprints per company that are overlapping data for each service
 - `<es_id>_flagged`: For each service, the number of assets flagged
-- `percent_<es_id>_flagged`:  For each service, the percent of assets flagged
+- `percent_<es_id>_flagged`: For each service, the percent of assets flagged
 - `total_assets`: Total number of assets belonging to each company
-- `total_area`: Total area of asset footprints belonging to each company
-- `total_flagged`: Number of assets flagged (receiving a 1) for criteria 2.d in section (4) above
+- `total_area`: Total area (in square meters) of asset footprints belonging to each company
+- `total_flagged`: Number of assets flagged (receiving a 1) by criteria defined above
 - `percent_total_flagged`: Percent of assets flagged in any category
 
 Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units.
@@ -232,7 +236,7 @@ Example:
 | AAA Inc. | 0.57        | 0.7      | 13         | ... |
 
 ### CSV and point vector
-**Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there is no data available at that location.
+**Point mode** produces a CSV and a point vector in geopackage (.gpkg) format. Both contain the same data. These are copies of the input data with additional columns added. There is one column added for each ecosystem service. This column contains the ecosystem service value at each point, or `NULL` if there are no data available at that location.
 
 ### polygon vector
 **Buffer mode** and **Polygon mode** both produce a polygon vector in geopackage (.gpkg) format. It is a copy of the input vector with additional columns added to the attribute table. There is one column added for each combination of ecosystem service and statistic.
