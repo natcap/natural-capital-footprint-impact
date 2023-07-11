@@ -215,7 +215,7 @@ The output vector attribute table is based on the point or polygon asset vector 
 Using the provided service list, 10 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
 
 Example attribute table:
-| FID | kba     | kba_flag | ... |
+| FID | kba_max | kba_flag | ... |
 |-----|---------|----------|-----|
 | 1   | 1       | 1        | ... |
 | 2   | 0       | 0        | ... | 
