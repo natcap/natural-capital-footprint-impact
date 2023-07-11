@@ -5,7 +5,7 @@ Asset and company footprint impact workflow (eventually to be made public)
 
 ## Introduction
 
-This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape. 
+This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape. It uses point or polygon locations of corporate assets, along with raster layers of ecosystem services to generate spatial and tabular results that can be used to compare ecosystem service impacts across assets.
 
 The ecosystem services provided are:
 - `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. 
