@@ -14,7 +14,7 @@ The ecosystem services provided are:
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. 
 - `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. 
 
-Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers, and links to download them.
+Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers.
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies land on Earth's surface, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -74,20 +74,20 @@ Five raster datasets are provided for use with this script. Four ecosystem servi
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit. [Download link for sediment retention](https://drive.google.com/file/d/1muGnbHeOVpA0osaUoPdrA02m1b5Ugn5u/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). [Download link for KBAs](https://drive.google.com/file/d/1oWv-QGWV2wkzma5p6dvUVsOInmcOUQ4K/view?usp=drive_link). The license for using these data is provided in the [Key Biodiversity Areas Terms of Service](https://www.keybiodiversityareas.org/termsofservice). Of note, they may not be used for commercial purposes.
 
-Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
-Columns are:
+The script requires that all services to be analyzed are listed in a CSV (comma-separated value) table, where each row represents an ecosystem service.
+Required columns are:
 - `es_id`: A unique identifier for the ecosystem service. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
-- `es_value_path`: File path to a GDAL-supported geospatial raster map of the ecosystem service
-- `flag_threshold`: Flagging threshold value for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
+- `es_value_path`: File path to a GDAL-supported geospatial raster map of the ecosystem service. These may be given as paths that are relative to the location of the CSV file, or may be given as absolute paths.
+- `flag_threshold`: Threshold value of interest for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged, and results will be provided indicating whether the service value for each asset exceeds this threshold. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
 
-| es_id    | es_value_path         | flag_threshold         |
-|----------|-----------------------|------------------------|
-| sediment | foo-sediment.tif      | 123                    |
-| ...      | ...                   | ...                    |
+| es_id    | es_value_path                                                    | flag_threshold         |
+|----------|----------------------------------------------------------------  |------------------------|
+| sediment | ES_layers/sediment_retention_for_downstream_populations.tif      | 96485936               |
+| ...      | ...                                                              | ...                    |
 
-*Table 3. Ecosystem service table: defines the ecosystem service layers that will be used by the script.*
+*Table 3. Ecosystem service table example: defines the ecosystem service layers that will be used by the script.*
 
-You may modify or replace this table if you wish to use different ecosystem service data, but they must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields.
+You may modify or replace this table, with the requirement that it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields. This table must be modified if you are using your own service layers or changing the path location of the default layers.
 
 ## Installation
 
