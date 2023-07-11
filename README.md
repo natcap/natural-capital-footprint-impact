@@ -72,7 +72,7 @@ The second column is named `area`. This is the area (in square meters) of footpr
 | Bank Branch       | 5073.7         |
 | ...               | ...            |
 
-*Table 3. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
+*Table 3. Buffer table: footprint area (in square meters) modeled for each asset category, used in Buffer mode.*
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
