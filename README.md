@@ -35,8 +35,8 @@ Required for both **Point mode** and **Buffer mode**. Point data must be provide
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
-1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations.
-2. The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
+1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations, which corresponds to the default data provided in the Buffer Table (Table 2).
+2. The `company` attribute is required for both **Point mode** and **Buffer mode**, and is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
 
 Field names must be spelled exactly as shown above, with no extra spaces or characters.
 
@@ -44,13 +44,15 @@ Field names must be spelled exactly as shown above, with no extra spaces or char
 
 Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the same layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
 
-The `company` attribute is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics. The field name, `company`, must be spelled exactly as shown here, with no extra spaces or characters.
+The `company` attribute is reqired for **Polygon mode**, and is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics. The field name, `company`, must be spelled exactly as shown here, with no extra spaces or characters.
+
+
 
 ## Data provided for you
 
 ### footprint data by asset category
 Footprint buffer area data are defined in a CSV (comma-separated value) table (Table 2), where each row represents an asset category.
-The first column is named `category`. The category values will be cross-referenced with the *category* field in the asset table (Table 1).
+The first column is named `category`. The category values will be cross-referenced with the *category* field in the Asset Table (Table 1).
 The second column is named `area`. This is the area (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
 | category          | area           |
@@ -76,7 +78,7 @@ Five raster datasets are provided for use with this script. Four ecosystem servi
 
 The script requires that all services to be analyzed are listed in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Required columns are:
-- `es_id`: A unique identifier for the ecosystem service. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
+- `es_id`: A unique identifier for the ecosystem service, which consists of any ASCII characters and may be of any length. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
 - `es_value_path`: File path to a GDAL-supported geospatial raster map of the ecosystem service. These may be given as paths that are relative to the location of the CSV file, or may be given as absolute paths.
 - `flag_threshold`: Threshold value of interest for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged, and results will be provided indicating whether the service value for each asset exceeds this threshold. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
 
@@ -145,10 +147,10 @@ options:
                         buffer asset points according to values in this table 
 ```
 
-These examples assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_eckert.gpkg`. You may use any other valid file path instead.
+The examples below assume your ecosystem service table is named `ecosystem_service_table.csv` and your assets vector is named `assets_example.gpkg`. You may use any other valid file path instead.
 
 ### Point mode
-`natural-capital-footprint-impact -e ecosystem_service_table.csv points assets_eckert.gpkg asset_results.gpkg company_results.csv`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv points assets_example.gpkg asset_results.gpkg company_results.csv`
 
 In **Point mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is not known or modeled. Ecosystem service statistics are calculated under each point only.
 
@@ -158,9 +160,9 @@ When run in point mode, the script performs these steps:
 3. Aggregates statistics about the asset points for each `company`.
 
 ### Point buffer mode
-`natural-capital-footprint-impact -e ecosystem_service_table.csv points --buffer-table buffer_table.csv assets_eckert.gpkg asset_results.gpkg company_results.csv`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv points --buffer-table buffer_table.csv assets_example.gpkg asset_results.gpkg company_results.csv`
 
-In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer table. Ecosystem service statistics are calculated under each footprint.
+In **Buffer mode**, you provide the assets as latitude/longitude coordinate points. The asset footprint is modeled by buffering each point with an area determined by the asset category in the Buffer Table. Ecosystem service statistics are calculated under each footprint.
 
 When run in point buffer mode, the script performs these steps:
 1. Cross-references the asset vector with the buffer table on the `category` attribute to get the buffer area for each asset.
@@ -170,7 +172,7 @@ When run in point buffer mode, the script performs these steps:
 5. Aggregates statistics about the assets for each `company`.
 
 ### Polygon mode
-`natural-capital-footprint-impact -e ecosystem_service_table.csv polygons assets_eckert.gpkg asset_results.gpkg company_results.csv`
+`natural-capital-footprint-impact -e ecosystem_service_table.csv polygons assets_example.gpkg asset_results.gpkg company_results.csv`
 
 In **Polygon mode**, you provide the assets as footprint polygons. This mode is preferred if asset footprint data are available. Ecosystem service statistics are calculated under each footprint.
 
@@ -187,7 +189,7 @@ If the polygon overlaps the centerpoint of at least one pixel:
 If the polygon does not overlap the centerpoint of any pixel:
     Statistics are calculated from the set of pixel(s) that intersect the bounding box of the polygon
 ```
-If this causes problems, you may try resampling the ecosystem service layers to a finer resolution.
+If this causes problems, you may try resampling the ecosystem service layers to a finer (smaller) resolution.
 
 ## Output formats
 
