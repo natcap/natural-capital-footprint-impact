@@ -1,7 +1,0 @@
-gdal
-geopandas
-numpy
-pandas
-pygeoprocessing
-pyogrio
-rasterio
