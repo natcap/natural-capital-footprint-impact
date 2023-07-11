@@ -259,7 +259,7 @@ The output company table contains
 
 Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the **Data provided for you** section of this Readme for a description of these services and their units.
 
-Example:
+Example output company statistics table:
 | company  | kba_adj_sum | kba_mean | kba_assets | ... |
 |----------|-------------|----------|------------|-----|
 | XYZ Corp | 0           | 0        | 3          | ... |
