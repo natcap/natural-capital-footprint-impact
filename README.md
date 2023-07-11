@@ -35,15 +35,15 @@ Required for both **Point mode** and **Buffer mode**. Point data must be provide
 
 The asset vector layer contains an attribute table, where each row represents an asset. The following fields are used by the script:
 
-1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations, which corresponds to the default data provided in the Buffer Table (Table 2).
+1. The `category` column determines footprint size. This field is required when using **Buffer mode** only. Footprint sizes vary widely, but correlate with the type of asset (for example, power plants take up more space than restaurants). As a default, we categorize assets using the S&P "facility category" designations, which corresponds to the default data provided in the Buffer Table (Table 3).
 2. The `company` attribute is required for both **Point mode** and **Buffer mode**, and is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics.
 
 Field names must be spelled exactly as shown above, with no extra spaces or characters.
 
-| <...other non-script related attributes...>   | category           | company        |
-|-----------------------------------------------|--------------------|----------------|
-| <...non-script-related value...>              | Bank Branch        | XYZ Corp       |
-| ...                                           | ...                | ....           |
+| FID  | <...other non-script related attributes...>   | category           | company        |
+|------|-----------------------------------------------|--------------------|----------------|
+| 0    | <...non-script-related value...>              | Bank Branch        | XYZ Corp       |
+| 1    | ...                                           | ...                | ....           |
 
 *Table 1. Point asset vector attribute table example.*
 
@@ -53,12 +53,17 @@ Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supporte
 
 The `company` attribute is reqired for **Polygon mode**, and is used to aggregate results. Assets belonging to the same `company` will be grouped together when calculating the aggregate statistics. The field name, `company`, must be spelled exactly as shown here, with no extra spaces or characters.
 
+| FID | <...other non-script related attributes...>   | company        |
+|-----|-----------------------------------------------|----------------|
+| 0   | <...non-script-related value...>              | XYZ Corp       |
+| 1   | ...                                           | ....           |
 
+*Table 2. Polygon asset vector attribute table example.*
 
 ## Data provided for you
 
 ### footprint data by asset category
-Footprint buffer area data are defined in a CSV (comma-separated value) table (Table 2), where each row represents an asset category.
+Footprint buffer area data are defined in a CSV (comma-separated value) table (Table 3), where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the *category* field in the Asset Table (Table 1).
 The second column is named `area`. This is the area (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
 
@@ -67,7 +72,7 @@ The second column is named `area`. This is the area (in square meters) of footpr
 | Bank Branch       | 5073.7         |
 | ...               | ...            |
 
-*Table 2. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
+*Table 3. Buffer table: footprint area modeled for each asset category, used in Buffer mode.*
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
@@ -94,7 +99,7 @@ Required columns are:
 | sediment | ES_layers/sediment_retention_for_downstream_populations.tif      | 96485936               |
 | ...      | ...                                                              | ...                    |
 
-*Table 3. Ecosystem service table example: defines the ecosystem service layers that will be used by the script.*
+*Table 4. Ecosystem service table example: defines the ecosystem service layers that will be used by the script.*
 
 You may modify or replace this table, with the requirement that it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields. This table must be modified if you are using your own service layers or changing the path location of the default layers.
 
@@ -213,7 +218,7 @@ Example attribute table:
 | FID | kba     | kba_flag | ... |
 |-----|---------|----------|-----|
 | 1   | 1       | 1        | ... |
-| 2   | 0       | 0        | ... |
+| 2   | 0       | 0        | ... | 
 
 **In point buffer mode and polygon mode:**
 - `<es_id>_max`: maximum service value within the asset footprint.
