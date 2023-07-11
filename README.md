@@ -214,11 +214,12 @@ The output vector attribute table is based on the point or polygon asset vector 
 
 Using the provided service list, 10 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
 
-Example attribute table:
+Example output attribute table for point mode:
 | FID | kba_max | kba_flag | ... |
 |-----|---------|----------|-----|
 | 1   | 1       | 1        | ... |
 | 2   | 0       | 0        | ... | 
+  
 
 **In point buffer mode and polygon mode:**
 - `<es_id>_max`: maximum service value within the asset footprint.
@@ -232,7 +233,7 @@ Note: These statistics are derived from the set of pixels that is calculated as 
 
 Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics.
 
-Example attribute table:
+Example output attribute table for buffer mode and polygon mode:
 | FID | kba_max | kba_mean | kba_adj_sum | ... |
 |-----|---------|----------|-------------|-----|
 | 1   | 1       | 0.25     | 0.3         | ... |
