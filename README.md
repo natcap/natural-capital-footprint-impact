@@ -239,7 +239,7 @@ Example output attribute table for buffer mode and polygon mode:
 | 1   | 1       | 0.25     | 0.3         | ... |
 | 2   | 0       | 0        | 0           | ... |
 
-The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean`, and `<es_id>_adj_sum` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
+The units for the `<es_id>`, `<es_id>_max`, `<es_id>_mean`, and `<es_id>_adj_sum` values will vary depending on the service. If you are using the default/provided services, see the **Data provided for you** section of this Readme for a description of these services and their units. If the ecosystem service table has been modified with a different number of services, then the statistics will be calculated for each of the user-defined services, with new columns defined as noted above. 
 
 
 
@@ -257,7 +257,7 @@ The output company table contains
 - `total_flagged`: Number of assets flagged (receiving a 1) by criteria defined above
 - `percent_total_flagged`: Percent of assets flagged in any category
 
-Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the introduction in this Readme for a description of these services and their units.
+Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the **Data provided for you** section of this Readme for a description of these services and their units.
 
 Example:
 | company  | kba_adj_sum | kba_mean | kba_assets | ... |
