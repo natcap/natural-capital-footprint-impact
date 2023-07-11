@@ -42,7 +42,7 @@ Field names must be spelled exactly as shown above, with no extra spaces or char
 
 | <...other non-script related attributes...>   | category           | company        |
 |-----------------------------------------------|--------------------|----------------|
-| <non-script-related value>                    | Bank Branch        | XYZ Corp       |
+| <...non-script-related value...>              | Bank Branch        | XYZ Corp       |
 | ...                                           | ...                | ....           |
 
 *Table 1. Point asset vector attribute table example.*
