@@ -3,14 +3,18 @@
 
 Asset and company footprint impact workflow (eventually to be made public)
 
-This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape.
+## Introduction
+
+This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape. 
 
 The ecosystem services provided are:
-- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit.
-- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit.
-- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit.
-- `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019.
-- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019).
+- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. 
+- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
+- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
+- `nature_access`: The number of people within 1 hour travel distance of every pixel. 
+- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). 
+
+Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers, and links to download them.
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies land on Earth's surface, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -59,6 +63,17 @@ The second column is named `area`. This is the area (in square meters) of footpr
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
 ### ecosystem service data
+
+Ecosystem service data are provided as geospatial raster layers (such as TIFFs), where each pixel has a value representing the quantity of service provided at that pixel. 
+
+Five raster datasets are provided for use with this script. Four ecosystem service rasters - sediment retention, nitrogen retention, coastal risk reduction, nature access - and one biodiversity raster - Key Biodiversity Areas (KBAs). In order to use this script, you must either download one or more of these layers, or provide your own. Following is a description of each provided layer, along with links for downloading them. 
+
+- `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit. [Download link for coastal risk](https://drive.google.com/file/d/1zhM8vvQiFW8xtkpH7tnIFtZt-0yydsZ0/view?usp=drive_link).
+- `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit. [Download link for nitrogen retention](https://drive.google.com/file/d/1YWqL5--7i77gjdXZO22p5lHKK5BSTXGY/view?usp=drive_link).
+- `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit. [Download link for sediment retention](https://drive.google.com/file/d/1muGnbHeOVpA0osaUoPdrA02m1b5Ugn5u/view?usp=drive_link).
+- `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. [Download link for nature access](https://drive.google.com/file/d/179tYugUOHy_fNWaTN1BGUMERF231TAxr/view?usp=drive_link).
+- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). [Download link for KBAs](https://drive.google.com/file/d/1oWv-QGWV2wkzma5p6dvUVsOInmcOUQ4K/view?usp=drive_link).
+
 Services are defined in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Columns are:
 - `es_id`: A unique identifier for the ecosystem service. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
