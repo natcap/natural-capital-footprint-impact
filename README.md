@@ -209,7 +209,7 @@ If this causes problems, you may try resampling the ecosystem service layers to 
 The output vector attribute table is based on the point or polygon asset vector provided as input. Several statistics are calculated for each ecosystem service:
 
 **In point mode:**
-- `<es_id>`: maximum service value within the asset footprint
+- `<es_id>_max`: maximum service value within the asset footprint
 - `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
 
 Using the provided service list, 10 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
