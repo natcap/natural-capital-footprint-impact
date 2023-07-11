@@ -40,6 +40,13 @@ The asset vector layer contains an attribute table, where each row represents an
 
 Field names must be spelled exactly as shown above, with no extra spaces or characters.
 
+| <...other non-script related attributes...>   | category           | company        |
+|-----------------------------------------------|--------------------|----------------|
+| <non-script-related value>                    | Bank Branch        | XYZ Corp       |
+| ...                                           | ...                | ....           |
+
+*Table 1. Point asset vector attribute table example.*
+
 #### Polygon asset vector
 
 Required for **Polygon mode**. Polygon data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All polygons must be in the same layer. All features in the layer must be of the `Polygon` or `MultiPolygon` type. Any attributes that exist in the original vector attribute table will be preserved in the output.
