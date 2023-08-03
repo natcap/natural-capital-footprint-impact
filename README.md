@@ -105,18 +105,22 @@ You may modify or replace this table, with the requirement that it must be in CS
 
 ## Installation
 
-1. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), if you haven't already. We recommend using `conda` because it is the easiest way to install the `gdal` dependency. 
-2. Run the following commands in the terminal:
-    ```
-    $ conda create -n footprint python gdal
-    $ conda activate footprint
-    $ pip install git+https://github.com/natcap/natural-capital-footprint-impact.git@main
-    ```
-3. The command `natural-capital-footprint-impact` should now be available:
-   ```
-   $ natural-capital-footprint-impact --help
-   usage: ...
-   ```
+Before installing `natural-capital-footprint-impact`, you must have already installed GDAL. We recommend using `conda` because it is the easiest way to install GDAL:
+```
+$ conda create -n footprint python gdal
+$ conda activate footprint
+```
+If you cannot use `conda`, see the [GDAL website](https://gdal.org/download.html) and [PyPI page](https://pypi.org/project/GDAL/) for alternate installation instructions.
+
+Install `natural-capital-footprint-impact`:
+```
+$ pip install git+https://github.com/natcap/natural-capital-footprint-impact.git@main
+```
+The command `natural-capital-footprint-impact` will then be available:
+```
+$ natural-capital-footprint-impact --help
+usage: ...
+```
 
 ## Workflow
 1. If your asset point data are in CSV format, convert it to a GDAL-supported vector format such as GeoPackage (GPKG):
