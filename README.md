@@ -5,7 +5,7 @@ Asset and company footprint impact workflow
 
 ## Introduction
 
-This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services, based on their physical footprint on the landscape. It uses point or polygon locations of corporate assets, along with raster layers of ecosystem services to generate spatial and tabular results that can be used to compare ecosystem service impacts across assets.
+This command-line script calculates metrics of the impact of human-made structures on certain ecosystem services and measures of biodiversity, based on their physical footprint on the landscape. It uses point or polygon locations of corporate assets, along with raster layers of ecosystem services or biodiversity metrics to generate spatial and tabular results that can be used to compare impacts across assets, companies, and portfolios.
 
 The ecosystem services provided are:
 - `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. 
@@ -14,7 +14,7 @@ The ecosystem services provided are:
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. 
 - `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. 
 
-Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers.
+Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers, including layer-specific licensing information.
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies land on Earth's surface, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -86,7 +86,7 @@ Five raster datasets are provided for use with this script. Four ecosystem servi
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. [Download link for nature access](https://drive.google.com/file/d/179tYugUOHy_fNWaTN1BGUMERF231TAxr/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit. [Download link for nitrogen retention](https://drive.google.com/file/d/1YWqL5--7i77gjdXZO22p5lHKK5BSTXGY/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit. [Download link for sediment retention](https://drive.google.com/file/d/1muGnbHeOVpA0osaUoPdrA02m1b5Ugn5u/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). [Download link for KBAs](https://drive.google.com/file/d/1oWv-QGWV2wkzma5p6dvUVsOInmcOUQ4K/view?usp=drive_link). The license for using these data is provided in the [Key Biodiversity Areas Terms of Service](https://www.keybiodiversityareas.org/termsofservice). Of note, they may not be used for commercial purposes.
+- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). [Download link for KBA within 1 km](https://drive.google.com/file/d/1oWv-QGWV2wkzma5p6dvUVsOInmcOUQ4K/view?usp=drive_link). The license for using these data is provided in the [Key Biodiversity Areas Terms of Service](https://www.keybiodiversityareas.org/termsofservice). Of note, they may not be used for commercial purposes.
 
 The script requires that all services to be analyzed are listed in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Required columns are:
