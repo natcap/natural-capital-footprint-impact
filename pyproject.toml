@@ -11,7 +11,8 @@ dependencies = [
     "pandas",
     "pygeoprocessing",
     "pyogrio",
-    "rasterio"
+    "rasterio",
+    "taskgraph"
 ]
 version = "0.1.0"
 
