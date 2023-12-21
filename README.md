@@ -12,7 +12,6 @@ The ecosystem services provided are:
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. 
-- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not. 
 
 Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers, including layer-specific licensing information.
 
@@ -80,19 +79,18 @@ The provided footprint areas were derived by manually estimating the footprint a
 
 Ecosystem service data are provided as geospatial raster layers (such as TIFFs), where each pixel has a value representing the quantity of service provided at that pixel. 
 
-Five raster datasets are provided for use with this script. Four ecosystem service rasters - sediment retention, nitrogen retention, coastal risk reduction, nature access - and one biodiversity raster - the presence or absence of a Key Biodiversity Area (KBA) within 1 km. In order to use this script, you must either download one or more of these layers, or provide your own. Following is a description of each provided layer, along with links for downloading them. 
+Four ecosystem service raster datasets are provided for use with this script - sediment retention, nitrogen retention, coastal risk reduction, nature access. In order to use this script, you must either download one or more of these layers, or provide your own layers representing ecosystem services or biodiversity values. Following is a description of each provided layer, along with links for downloading them. 
 
 - `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. Risk reduction is calculated using the InVEST Coastal Vulnerability model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing a relative index of risk reduction times the number of people who benefit. [Download link for coastal risk](https://drive.google.com/file/d/1zhM8vvQiFW8xtkpH7tnIFtZt-0yydsZ0/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. [Download link for nature access](https://drive.google.com/file/d/179tYugUOHy_fNWaTN1BGUMERF231TAxr/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Nitrogen retention is calculated using the InVEST Nutrient Delivery Ratio (NDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing kilograms of nitrogen retained times number of people who benefit. [Download link for nitrogen retention](https://drive.google.com/file/d/1YWqL5--7i77gjdXZO22p5lHKK5BSTXGY/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. Sediment retention is calculated using the InVEST Sediment Delivery Ratio (SDR) model. Modeling by Chaplin-Kramer and Sharp (2023). Population is from Landscan 2019. Values are unitless, representing tons of sediment retained times number of people who benefit. [Download link for sediment retention](https://drive.google.com/file/d/1muGnbHeOVpA0osaUoPdrA02m1b5Ugn5u/view?usp=drive_link). License for using these data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-- `kba_within_1km`: Binary value indicating whether each pixel is within 1 kilometer of a Key Biodiversity Area (KBA) or not (1 = yes, 0 = no). Adapted from data created for Damania et al. (2023). KBAs are from BirdLife International (2019). [Download link for KBA within 1 km - currently unavailable]. The license for using these data is provided in the [Key Biodiversity Areas Terms of Service](https://www.keybiodiversityareas.org/termsofservice). Of note, they may not be used for commercial purposes. Commerical use includes any use by, on behalf of, or to inform or assist the activities of, a commercial entity (an entity that operates ‘for profit’) or b) use by any individual or non-profit entity for the purposes of revenue generation.
 
 The script requires that all services to be analyzed are listed in a CSV (comma-separated value) table, where each row represents an ecosystem service.
 Required columns are:
 - `es_id`: A unique identifier for the ecosystem service, which consists of any ASCII characters and may be of any length. This identifier is used to label the output statistics. The `es_id`s for the provided data are: `coastal_risk_reduction_service`, `nitrogen_retention_service`, `sediment_retention_service`, `nature_access`, `endemic_biodiversity`, `redlist_species`, `species_richness`, `kba_within_1km`. 
 - `es_value_path`: File path to a GDAL-supported geospatial raster map of the ecosystem service. These may be given as paths that are relative to the location of the CSV file, or may be given as absolute paths.
-- `flag_threshold`: Threshold value of interest for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged, and results will be provided indicating whether the service value for each asset exceeds this threshold. In the provided data, we used the 90th percentile value as the threshold for each ecosystem service, except for Coastal Risk Reduction and KBA, for which the threshold was 0.
+- `flag_threshold`: Threshold value of interest for the ecosystem service. Pixels with an ecosystem service value greater than this threshold will be flagged, and results will be provided indicating whether the service value for each asset exceeds this threshold. In the provided data, we used the 90th percentile of global terrestrial values as the threshold for each ecosystem service. For Coastal Risk Reduction, this included any value greater than 0.
 
 | es_id    | es_value_path                                                    | flag_threshold         |
 |----------|----------------------------------------------------------------  |------------------------|
@@ -216,10 +214,10 @@ The output vector attribute table is based on the point or polygon asset vector 
 - `<es_id>_max`: maximum service value within the asset footprint
 - `<es_id>_flag`: binary value indicating whether the asset has been flagged. Assets are flagged if their `<es_id>_max` value is greater than the corresponding `flag_threshold` value in the ecosystem service table.
 
-Using the provided service list, 10 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
+Using the provided service list, 8 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 2 statistics.
 
 Example output attribute table for point mode:
-| FID | kba_max | kba_flag | ... |
+| FID | crr_max | crr_flag | ... |
 |-----|---------|----------|-----|
 | 1   | 1       | 1        | ... |
 | 2   | 0       | 0        | ... | 
@@ -235,10 +233,10 @@ Example output attribute table for point mode:
 
 Note: These statistics are derived from the set of pixels that is calculated as described above, see "Caveats about footprint statistics".
 
-Using the provided service list, 30 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 5 ecosystem services and these 6 statistics.
+Using the provided service list, 24 columns named `<es_id>_<statistic>` are added to the original attribute table, one for each combination of the 4 ecosystem services and these 6 statistics.
 
 Example output attribute table for buffer mode and polygon mode:
-| FID | kba_max | kba_mean | kba_adj_sum | ... |
+| FID | crr_max | crr_mean | crr_adj_sum | ... |
 |-----|---------|----------|-------------|-----|
 | 1   | 1       | 0.25     | 0.3         | ... |
 | 2   | 0       | 0        | 0           | ... |
@@ -264,7 +262,7 @@ The output company table contains
 Again, the units for the `<es_id>_adj_sum` and `<es_id>_mean` values will vary depending on the service. If you are using the default/provided services, see the **Data provided for you** section of this Readme for a description of these services and their units.
 
 Example output company statistics table:
-| company  | kba_adj_sum | kba_mean | kba_assets | ... |
+| company  | crr_adj_sum | crr_mean | crr_assets | ... |
 |----------|-------------|----------|------------|-----|
 | XYZ Corp | 0           | 0        | 3          | ... |
 | AAA Inc. | 0.57        | 0.7      | 13         | ... |
@@ -282,8 +280,6 @@ ogr2ogr -f CSV asset_results.csv asset_results.gpkg
 ```
 
 ## References
-
-BirdLife International (2019). Digital boundaries of Key Biodiversity Areas from the World Database of Key Biodiversity Areas. Developed by the KBA Partnership: BirdLife International, International Union for the Conservation of Nature, Amphibian Survival Alliance, Conservation International, Critical Ecosystem Partnership Fund, Global Environment Facility, Global Wildlife Conservation, NatureServe, Rainforest Trust, Royal Society for the Protection of Birds, Wildlife Conservation Society and World Wildlife Fund. September 2019 Version. Available at http://www.keybiodiversityareas.org/site/requestgis. 
 
 Chaplin-Kramer, R. and Sharp., R.P. Nature’s Contributions to People under Potential Natural Vegetation. (Unpublished dataset). Based on models described in Chaplin-Kramer, R., Neugarten, R. A., Sharp, R. P., Collins, P. M., Polasky, S., Hole, D., et al. (2023). Mapping the planet’s critical natural assets. Nature Ecology & Evolution, 7(1), 51-61.
 
