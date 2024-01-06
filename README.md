@@ -1,4 +1,4 @@
-# natural capital footprint impact
+# Ecosystem Services Footprinting Tool
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 Asset and company footprint impact workflow
@@ -13,7 +13,7 @@ The ecosystem services provided are:
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
 - `nature_access`: The number of people within 1 hour travel distance of every pixel. 
 
-Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers, including layer-specific licensing information.
+Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers.
 
 Some useful definitions:
 - **Asset**: A unit of physical infrastructure that occupies land on Earth's surface, such as a mine, office, restaurant, cell tower, hospital, pipeline, or billboard.
@@ -26,7 +26,7 @@ Asset location data are usually available as point coordinates (latitude/longitu
 
 ## Data you must provide
 
-### asset vector
+### Asset vector
 
 #### Point asset vector
 
@@ -61,7 +61,7 @@ The `company` attribute is reqired for **Polygon mode**, and is used to aggregat
 
 ## Data provided for you
 
-### footprint data by asset category
+### Footprint data by asset category
 Footprint buffer area data are defined in a CSV (comma-separated value) table (Table 3), where each row represents an asset category.
 The first column is named `category`. The category values will be cross-referenced with the *category* field in the Asset Table (Table 1).
 The second column is named `area`. This is the area (in square meters) of footprint to draw for assets of this category. Footprints will be drawn as a circular buffer around each asset point.
@@ -75,7 +75,7 @@ The second column is named `area`. This is the area (in square meters) of footpr
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
-### ecosystem service data
+### Ecosystem service data
 
 Ecosystem service data are provided as geospatial raster layers (such as TIFFs), where each pixel has a value representing the quantity of service provided at that pixel. 
 
