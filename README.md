@@ -11,7 +11,7 @@ The ecosystem services provided are:
 - `coastal_risk_reduction_service`: Relative value of coastal and marine habitats for reducing the risk of erosion and inundation from storms for people who live near the coast. 
 - `nitrogen_retention_service`: Nitrogen that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
 - `sediment_retention_service`: Sediment that is retained by the landscape, keeping it out of streams, times the number of people who live downstream who may benefit from cleaner water. 
-- `nature_access`: The number of people within 1 hour travel distance of every pixel. 
+- `nature_access`: For each pixel considered, the number of people within a 1-hour travel distance to it. 
 
 Please see the **Data provided for you > ecosystem service data** section below in this document for more information about these layers.
 
