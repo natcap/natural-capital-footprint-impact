@@ -77,7 +77,9 @@ The second column is named `area`. This is the area (in square meters) of footpr
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
-[Download the footprint data by asset category CSV table here.](https://drive.google.com/file/d/1NSDoD916hMVuM0LDE9kJqJSmWaMq-elk/view?usp=drive_link)
+[Download the footprint area data by asset category CSV table here.](https://drive.google.com/file/d/1NSDoD916hMVuM0LDE9kJqJSmWaMq-elk/view?usp=drive_link)
+
+For linear assets (specifically transmission lines and natural gas pipelines), [download this CSV table.](https://drive.google.com/file/d/1z12XsguqvH8gN8VJe8Pf8GU2owPJh33v/view?usp=drive_link)
 
 
 ### Ecosystem service data
