@@ -77,7 +77,7 @@ The second column is named `area`. This is the area (in square meters) of footpr
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
-[Download the footprint area data by asset category CSV table here.](https://drive.google.com/file/d/1NSDoD916hMVuM0LDE9kJqJSmWaMq-elk/view?usp=drive_link)
+[Download the footprint area data by asset category CSV table.](https://drive.google.com/file/d/1NSDoD916hMVuM0LDE9kJqJSmWaMq-elk/view?usp=drive_link)
 
 For linear assets (specifically transmission lines and natural gas pipelines), [download this CSV table.](https://drive.google.com/file/d/1z12XsguqvH8gN8VJe8Pf8GU2owPJh33v/view?usp=drive_link)
 
@@ -108,7 +108,7 @@ Required columns are:
 
 You may modify or replace this table, with the requirement that it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields. This table must be modified if you are using your own service layers or changing the path location of the default layers.
 
-[Download a sample ecosystem service layer table here](https://drive.google.com/file/d/1PhYVhooe3iuJRks5cfLRCuV-E0oE5dCE/view?usp=drive_link), which can be used with the four service layers listed above.
+[Download a sample ecosystem service layer table](https://drive.google.com/file/d/1PhYVhooe3iuJRks5cfLRCuV-E0oE5dCE/view?usp=drive_link), which can be used with the four service layers listed above.
 
 
 ## Installation
