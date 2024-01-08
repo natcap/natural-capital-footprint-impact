@@ -75,6 +75,9 @@ The second column is named `area`. This is the area (in square meters) of footpr
 
 The provided footprint areas were derived by manually estimating the footprint area of real assets from  satellite imagery. We took the median of a small sample from each category. You may modify or replace this table if you wish to use different data, but they must be in CSV format, and include the required `category` and `area` fields.
 
+[Download the footprint data by asset category CSV table here.](https://drive.google.com/file/d/1NSDoD916hMVuM0LDE9kJqJSmWaMq-elk/view?usp=drive_link)
+
+
 ### Ecosystem service data
 
 Ecosystem service data are provided as geospatial raster layers (such as TIFFs), where each pixel has a value representing the quantity of service provided at that pixel. 
