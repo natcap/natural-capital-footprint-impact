@@ -108,6 +108,9 @@ Required columns are:
 
 You may modify or replace this table, with the requirement that it must be in CSV format, and include the required `es_id`, `es_value_path` and `flag_threshold`, fields. This table must be modified if you are using your own service layers or changing the path location of the default layers.
 
+[Download a sample ecosystem service layer table here](https://drive.google.com/file/d/1PhYVhooe3iuJRks5cfLRCuV-E0oE5dCE/view?usp=drive_link), which can be used with the four service layers listed above.
+
+
 ## Installation
 
 Before installing `natural-capital-footprint-impact`, you must have already installed GDAL. We recommend using `conda` because it is the easiest way to install GDAL:
