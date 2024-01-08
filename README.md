@@ -28,6 +28,8 @@ Asset location data are usually available as point coordinates (latitude/longitu
 
 ### Asset vector
 
+[Sample data for both point and vector assets can be downloaded here.](https://drive.google.com/file/d/1x69DKFqFIhUzc98XAHulC1AbjT6fBQHh/view?usp=drive_link)
+
 #### Point asset vector
 
 Required for both **Point mode** and **Buffer mode**. Point data must be provided in a [GDAL-supported vector format](https://gdal.org/drivers/vector/index.html). All points must be in the same layer. All features in the layer must be of the `Point` type. `MultiPoint`s are not allowed. Any attributes that exist in the original vector attribute table will be preserved in the output.
