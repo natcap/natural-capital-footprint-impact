@@ -2,6 +2,7 @@
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 Asset and company footprint impact workflow
+>**Suggested citation:** Natural Capital Project. 2023. _Ecosystem Services Footprinting Tool._ Natural Capital Project, Stanford University. Available at: https://github.com/natcap/natural-capital-footprint-impact
 
 ## Introduction
 
